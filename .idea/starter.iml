@@ -17,7 +17,7 @@
   </component>
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$" />
-    <orderEntry type="jdk" jdkName="Pipenv (starter)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Pipenv (full_stack_capstone)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TemplatesService">
