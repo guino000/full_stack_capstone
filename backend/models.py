@@ -46,8 +46,8 @@ class User(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     email = Column(String, nullable=False)
-    cart = relationship('carts', back_populates='users', uselist=False)
-    orders = relationship('orders', backref='users', lazy=True)
+    cart = relationship('Cart', backref='User', lazy=True)
+    orders = relationship('Order', backref='User', lazy=True)
 
     def __int__(self, name, email):
         self.name = name
@@ -69,7 +69,7 @@ class Product(db.Model):
     description = Column(String)
     cost = Column(DECIMAL, nullable=False)
     size = Column(String)
-    pictures = relationship('product_pictures', backref='products', lazy=True)
+    pictures = relationship('ProductPicture', backref='Product', lazy=True)
 
     def __init__(self, name, description, cost, size):
         self.name = name
@@ -82,18 +82,28 @@ class Product(db.Model):
             'id': self.id,
             'name': self.name,
             'description': self.description,
-            'cost': self.cost,
+            'cost': float(self.cost),
             'size': self.size,
-            'pictures': jsonify(self.pictures)
+            'pictures': [p.format() for p in self.pictures]
         }
 
 
-class ProductPictures(db.Model):
+class ProductPicture(db.Model):
     __tablename__ = 'product_pictures'
 
     id = Column(Integer, primary_key=True)
     url = Column(String)
     product_id = Column(Integer, ForeignKey('products.id'))
+
+    def __init__(self, url):
+        self.url = url
+
+    def format(self):
+        return {
+            'id': self.id,
+            'url': self.url,
+            'product_id': self.product_id
+        }
 
 
 class Order(db.Model):
@@ -104,8 +114,8 @@ class Order(db.Model):
     order_date = Column(DateTime)
     status = Column(String)
     tracking_code = Column(String)
-    products = relationship("products", secondary=order_items,
-                            backref=db.backref('orders', lazy=True))
+    products = relationship("Product", secondary=order_items,
+                            backref=db.backref('Order', lazy=True))
     user_id = Column(Integer, ForeignKey('users.id'))
 
     def __init__(self, order_number, order_date, status, tracking_code):
@@ -129,9 +139,9 @@ class Cart(db.Model):
     __tablename__ = 'carts'
 
     id = Column(Integer, primary_key=True)
-    products = relationship("Products", secondary=order_items,
-                            backref=db.backref('carts', lazy=True))
-    user = relationship('users', back_populates='carts')
+    products = relationship("Product", secondary=cart_items,
+                            backref=db.backref('Cart', lazy=True))
+    user_id = Column(Integer, ForeignKey('users.id'))
 
     def format(self):
         return {
