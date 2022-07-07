@@ -69,6 +69,63 @@ def create_app(test_config=None):
             db.session.rollback()
             abort(422)
 
+    @app.route('/products/<int:product_id>', methods=['PATCH'])
+    def update_product(product_id):
+        product = Product.query.filter(Product.id == product_id).one_or_none()
+
+        if product is None:
+            abort(404)
+
+        body = request.get_json()
+        new_name = body.get('name', None)
+        new_description = body.get('description', None)
+        new_cost = body.get('cost', None)
+        new_size = body.get('size', None)
+        new_picture_urls = body.get('pictures', '').split(';')
+
+        try:
+            if new_name:
+                product.name = new_name
+            if new_description:
+                product.description = new_description
+            if new_cost:
+                product.cost = new_cost
+            if new_size:
+                product.size = new_size
+            if new_picture_urls:
+                product.pictures = [ProductPicture(url) for url in new_picture_urls]
+
+            db.session.commit()
+
+            return jsonify({
+                'success': True,
+                'products': [product.format()]
+            })
+        except Exception as e:
+            print(str(e))
+            db.session.rollback()
+            abort(422)
+
+    @app.route('/products/<int:product_id>', methods=['DELETE'])
+    def delete_product(product_id):
+        product = Product.query.filter(Product.id == product_id).one_or_none()
+
+        if product is None:
+            abort(404)
+
+        try:
+            db.session.delete(product)
+            db.session.commit()
+
+            return jsonify({
+                'success': True,
+                'deleted': product.format()
+            })
+        except Exception as e:
+            print(str(e))
+            db.session.rollback()
+            abort(422)
+
     return app
 
 
