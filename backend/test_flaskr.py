@@ -3,8 +3,8 @@ import unittest
 
 from flask_sqlalchemy import SQLAlchemy
 
-from backend.app import create_app
-from backend.models import setup_db
+from app import create_app
+from models import setup_db
 
 
 class ShopTestCase(unittest.TestCase):
@@ -27,7 +27,7 @@ class ShopTestCase(unittest.TestCase):
 
     def test_crud_products(self):
         # Test Create
-        res = self.client.post('/products', json={
+        res = self.client.post('/products/', json={
             'name': 'Test Product',
             'description': 'This is a test product',
             'cost': 45.55,
@@ -38,10 +38,9 @@ class ShopTestCase(unittest.TestCase):
         data = res.get_json()
         self.assertTrue('success' in data)
         self.assertTrue('products' in data)
-        products = data.get('products', [])
 
         # Test Read
-        res = self.client.get('/products')
+        res = self.client.get('/products/')
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
         self.assertTrue('success' in data)
@@ -67,6 +66,48 @@ class ShopTestCase(unittest.TestCase):
 
         # Test Delete
         res = self.client.delete(f'/products/{products[0].get("id", 0)}')
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue('success' in data)
+        self.assertTrue('deleted' in data)
+
+    def test_crud_users(self):
+        # Test Create
+        res = self.client.post('/users/', json={
+            'name': 'Test User',
+            'email': 'test@user.com',
+        })
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue('success' in data)
+        self.assertTrue('users' in data)
+
+        # Test Read
+        res = self.client.get('/users/')
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue('success' in data)
+        self.assertTrue('users' in data)
+
+        users = data.get('users', [])
+
+        res = self.client.get(f'/users/{users[0].get("id", 0)}')
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue('success' in data)
+        self.assertTrue('user' in data)
+
+        # Test Update
+        res = self.client.patch(f'/users/{users[0].get("id", 0)}', json={
+            'email': 'test2@user.com'
+        })
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue('success' in data)
+        self.assertTrue('users' in data)
+
+        # Test Delete
+        res = self.client.delete(f'/users/{users[0].get("id", 0)}')
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
         self.assertTrue('success' in data)

@@ -73,7 +73,7 @@ class Product(db.Model):
 
     def __init__(self, name, description, cost, size):
         self.name = name
-        self.description = description,
+        self.description = description
         self.cost = cost
         self.size = size
 
