@@ -34,10 +34,23 @@ order_items = db.Table('order_items',
                        db.Column('product_id', Integer, db.ForeignKey('products.id'), primary_key=True)
                        )
 
-cart_items = db.Table('cart_items',
-                      db.Column('cart_id', Integer, db.ForeignKey('carts.id'), primary_key=True),
-                      db.Column('product_id', Integer, db.ForeignKey('products.id'), primary_key=True)
-                      )
+
+class CartItem(db.Model):
+    __tablename__ = 'cart_items'
+
+    cart_id = Column(Integer, ForeignKey('carts.id'), primary_key=True)
+    product_id = Column(Integer, ForeignKey('products.id'), primary_key=True)
+    quantity = Column(Integer, nullable=False)
+
+    product = relationship('Product', backref='CartItem', lazy=True, uselist=False)
+    cart = relationship('Cart', backref='CartItem', lazy=True, uselist=False)
+
+    def format(self):
+        return {
+            'cart': self.cart.format(),
+            'product': self.product.format(),
+            'quantity': self.quantity
+        }
 
 
 class User(db.Model):
@@ -46,7 +59,7 @@ class User(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     email = Column(String, nullable=False)
-    cart = relationship('Cart', backref='User', lazy=True)
+    cart = relationship('Cart', backref='User', lazy=True, uselist=False)
     orders = relationship('Order', backref='User', lazy=True)
 
     def __int__(self, name, email):
@@ -139,12 +152,11 @@ class Cart(db.Model):
     __tablename__ = 'carts'
 
     id = Column(Integer, primary_key=True)
-    products = relationship("Product", secondary=cart_items,
-                            backref=db.backref('Cart', lazy=True))
+    cart_items = relationship("CartItem", backref='Cart', lazy=True)
     user_id = Column(Integer, ForeignKey('users.id'))
 
     def format(self):
         return {
             'id': self.id,
-            'products': jsonify(self.products)
+            'user_id': self.user_id,
         }
