@@ -137,11 +137,9 @@ def add_item_to_cart(user_id):
 
     try:
         cart_item = CartItem()
-        cart_item.cart = user.cart
         cart_item.product = product
         cart_item.quantity = quantity
         user.cart.cart_items.append(cart_item)
-
         db.session.add(cart_item)
         db.session.commit()
 

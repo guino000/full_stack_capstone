@@ -46,7 +46,6 @@ class CartItem(db.Model):
 
     def format(self):
         return {
-            'cart': self.cart.format(),
             'product': self.product.format(),
             'quantity': self.quantity
         }

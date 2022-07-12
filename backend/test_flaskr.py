@@ -32,7 +32,7 @@ class ShopTestCase(unittest.TestCase):
             'description': 'This is a test product',
             'cost': 45.55,
             'size': 43,
-            'pictures': 'http://pic1.jpg;http://pic2.jpg;http://pic3.jpg;'
+            'pictures': 'http://pic1.jpg;http://pic2.jpg;http://pic3.jpg'
         })
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
