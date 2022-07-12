@@ -112,3 +112,62 @@ class ShopTestCase(unittest.TestCase):
         data = res.get_json()
         self.assertTrue('success' in data)
         self.assertTrue('deleted' in data)
+
+    def test_crud_cart(self):
+        # Test Create
+        res = self.client.post('/users/', json={
+            'name': 'Test User Cart',
+            'email': 'testcart@user.com',
+        })
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue('success' in data)
+        self.assertTrue('users' in data)
+
+        created = data.get('users')[0]
+
+        # Test Read
+        res = self.client.get(f'/users/{created.get("id")}/cart')
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue('success' in data)
+        self.assertTrue('products' in data)
+
+        # Test Update
+        res = self.client.post('/products/', json={
+            'name': 'Test Product',
+            'description': 'This is a test product',
+            'cost': 45.55,
+            'size': 43,
+            'pictures': 'http://pic1.jpg;http://pic2.jpg;http://pic3.jpg;'
+        })
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue('success' in data)
+        self.assertTrue('products' in data)
+
+        product = data.get('products')[0]
+
+        res = self.client.post(f'/users/{created.get("id")}/cart', json={
+            'product': product.get('id'),
+            'quantity': 50
+        })
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue('success' in data)
+        self.assertTrue('cart_items' in data)
+
+        # Test Delete
+        res = self.client.delete(f'/users/{created.get("id")}')
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue('success' in data)
+        self.assertTrue('deleted' in data)
+
+        res = self.client.delete(f'/products/{product.get("id")}')
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue('success' in data)
+        self.assertTrue('deleted' in data)
+
+

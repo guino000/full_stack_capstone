@@ -73,7 +73,7 @@ def create_user():
 
         return jsonify({
             'success': True,
-            'users': new_user.format()
+            'users': [new_user.format()]
         })
     except Exception as e:
         print(str(e))
@@ -112,7 +112,7 @@ def get_user_cart(user_id):
     return jsonify({
         'success': True,
         'user': user_id,
-        'products': [p.format() for p in user.cart.products]
+        'products': [p.format() for p in user.cart.cart_items]
     })
 
 
@@ -140,6 +140,7 @@ def add_item_to_cart(user_id):
         cart_item.cart = user.cart
         cart_item.product = product
         cart_item.quantity = quantity
+        user.cart.cart_items.append(cart_item)
 
         db.session.add(cart_item)
         db.session.commit()

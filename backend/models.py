@@ -6,7 +6,7 @@ from sqlalchemy import Column, create_engine, String, DateTime, DECIMAL, Integer
 from flask_sqlalchemy import SQLAlchemy
 import json
 
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 
 database_path = os.environ['DATABASE_URL']
 if database_path.startswith("postgres://"):
@@ -42,8 +42,7 @@ class CartItem(db.Model):
     product_id = Column(Integer, ForeignKey('products.id'), primary_key=True)
     quantity = Column(Integer, nullable=False)
 
-    product = relationship('Product', backref='CartItem', lazy=True, uselist=False)
-    cart = relationship('Cart', backref='CartItem', lazy=True, uselist=False)
+    product = relationship('Product', backref=backref('CartItem', cascade='delete, delete-orphan'), lazy=True, uselist=False)
 
     def format(self):
         return {
@@ -59,8 +58,8 @@ class User(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     email = Column(String, nullable=False)
-    cart = relationship('Cart', backref='User', lazy=True, uselist=False)
-    orders = relationship('Order', backref='User', lazy=True)
+    cart = relationship('Cart', backref='User', cascade="all,delete", lazy=True, uselist=False)
+    orders = relationship('Order', backref='User', cascade="all,delete", lazy=True)
 
     def __int__(self, name, email):
         self.name = name
@@ -82,7 +81,7 @@ class Product(db.Model):
     description = Column(String)
     cost = Column(DECIMAL, nullable=False)
     size = Column(String)
-    pictures = relationship('ProductPicture', backref='Product', lazy=True)
+    pictures = relationship('ProductPicture', backref='Product', cascade="all,delete", lazy=True)
 
     def __init__(self, name, description, cost, size):
         self.name = name
@@ -152,7 +151,7 @@ class Cart(db.Model):
     __tablename__ = 'carts'
 
     id = Column(Integer, primary_key=True)
-    cart_items = relationship("CartItem", backref='Cart', lazy=True)
+    cart_items = relationship("CartItem", backref='Cart', cascade="all,delete", lazy=True)
     user_id = Column(Integer, ForeignKey('users.id'))
 
     def format(self):
