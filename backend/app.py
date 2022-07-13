@@ -2,6 +2,7 @@ import os
 
 from flask import Flask
 
+from cart_api import cart_api
 from users_api import users_api
 from products_api import products_api
 from models import setup_db
@@ -15,6 +16,7 @@ def create_app(test_config=None):
 
     app.register_blueprint(products_api, url_prefix='/products')
     app.register_blueprint(users_api, url_prefix='/users')
+    app.register_blueprint(cart_api, url_prefix='/users')
 
     @app.route('/')
     def get_greeting():

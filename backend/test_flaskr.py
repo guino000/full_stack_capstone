@@ -141,15 +141,24 @@ class ShopTestCase(unittest.TestCase):
             'size': 43,
             'pictures': 'http://pic1.jpg;http://pic2.jpg;http://pic3.jpg;'
         })
+        data = res.get_json()
+        product1 = data.get('products')[0]
+
+        res = self.client.post('/products/', json={
+            'name': 'Test Product 2',
+            'description': 'This is a test product 2',
+            'cost': 66,
+            'size': 30,
+            'pictures': 'http://pic1.jpg;http://pic2.jpg;http://pic3.jpg;'
+        })
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
         self.assertTrue('success' in data)
         self.assertTrue('products' in data)
-
-        product = data.get('products')[0]
+        product2 = data.get('products')[0]
 
         res = self.client.post(f'/users/{created.get("id")}/cart', json={
-            'product': product.get('id'),
+            'product': product1.get('id'),
             'quantity': 50
         })
         self.assertEqual(res.status_code, 200)
@@ -157,14 +166,33 @@ class ShopTestCase(unittest.TestCase):
         self.assertTrue('success' in data)
         self.assertTrue('cart_items' in data)
 
+        self.client.post(f'/users/{created.get("id")}/cart', json={
+            'product': product2.get('id'),
+            'quantity': 50
+        })
+
         # Test Delete
+        res = self.client.delete(f'/users/{created.get("id")}/cart_items/{product1.get("id")}')
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue('success' in data)
+        self.assertTrue('deleted' in data)
+
+        # Test Clean Cart
+        res = self.client.delete(f'/users/{created.get("id")}/cart')
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue('success' in data)
+        self.assertTrue('deleted' in data)
+
+        # Clean Env
         res = self.client.delete(f'/users/{created.get("id")}')
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
         self.assertTrue('success' in data)
         self.assertTrue('deleted' in data)
 
-        res = self.client.delete(f'/products/{product.get("id")}')
+        res = self.client.delete(f'/products/{product1.get("id")}')
         self.assertEqual(res.status_code, 200)
         data = res.get_json()
         self.assertTrue('success' in data)

@@ -42,7 +42,8 @@ class CartItem(db.Model):
     product_id = Column(Integer, ForeignKey('products.id'), primary_key=True)
     quantity = Column(Integer, nullable=False)
 
-    product = relationship('Product', backref=backref('CartItem', cascade='delete, delete-orphan'), lazy=True, uselist=False)
+    product = relationship('Product', backref=backref('CartItem', cascade='delete, delete-orphan'),
+                           lazy='subquery', uselist=False)
 
     def format(self):
         return {
