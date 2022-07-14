@@ -2,9 +2,9 @@ import os
 
 from flask import Flask
 
-from cart_api import cart_api
-from users_api import users_api
-from products_api import products_api
+from api.cart_api import cart_api
+from api.users_api import users_api
+from api.products_api import products_api
 from models import setup_db
 from flask_cors import CORS
 

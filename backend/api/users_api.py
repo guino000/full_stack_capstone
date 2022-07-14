@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, abort, request
 
-from models import User, db, Cart, Product, CartItem
+from models import User, db, Cart
 
 users_api = Blueprint('users_api', __name__)
 
