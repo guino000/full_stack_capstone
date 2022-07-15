@@ -29,10 +29,25 @@ def setup_db(app, database_path=database_path):
     migrate = Migrate(app, db)
 
 
-order_items = db.Table('order_items',
-                       db.Column('order_id', Integer, db.ForeignKey('orders.id'), primary_key=True),
-                       db.Column('product_id', Integer, db.ForeignKey('products.id'), primary_key=True)
-                       )
+class OrderItem(db.Model):
+    __tablename__ = 'order_items'
+
+    order_id = Column(Integer, ForeignKey('orders.id'), primary_key=True)
+    product_id = Column(Integer, ForeignKey('products.id'), primary_key=True)
+    quantity = Column(Integer, nullable=False)
+
+    product = relationship('Product', backref=backref('OrderItem', cascade='delete, delete-orphan'),
+                           lazy='subquery', uselist=False)
+
+    def __init__(self, product, quantity):
+        self.product = product
+        self.quantity = quantity
+
+    def format(self):
+        return {
+            'product': self.product.format(),
+            'quantity': self.quantity
+        }
 
 
 class CartItem(db.Model):
@@ -126,15 +141,13 @@ class Order(db.Model):
     order_date = Column(DateTime)
     status = Column(String)
     tracking_code = Column(String)
-    products = relationship("Product", secondary=order_items,
-                            backref=db.backref('Order', lazy=True))
+    order_items = relationship("OrderItem", backref='Order', cascade="all,delete", lazy=True)
     user_id = Column(Integer, ForeignKey('users.id'))
 
-    def __init__(self, order_number, order_date, status, tracking_code):
+    def __init__(self, order_number, order_date, status):
         self.order_number = order_number,
         self.order_date = order_date,
-        self.status = status,
-        self.tracking_code = tracking_code
+        self.status = status
 
     def format(self):
         return {
@@ -143,7 +156,7 @@ class Order(db.Model):
             'order_date': self.order_date,
             'status': self.status,
             'tracking_code': self.tracking_code,
-            'products': jsonify(self.products)
+            'products': [oi.format() for oi in self.order_items]
         }
 
 
