@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export type Picture = {
   id: number,
   product_id: number,
@@ -11,6 +13,22 @@ export type Product = {
   pictures: Picture[],
   size: string,
   cost: number
+}
+
+export type ProductUpdate = {
+  name?: string,
+  description?: string,
+  pictures?: Picture[],
+  size?: string,
+  cost?: number
+}
+
+export type ProductCreate = {
+  name: string,
+  description?: string,
+  pictures?: string[],
+  size?: string,
+  cost?: number
 }
 
 export type IDParam = {
@@ -37,4 +55,43 @@ export async function getProduct(id: string): Promise<Product[]> {
   const data = await res.json()
   console.log(data)
   return data['product']
+}
+
+export async function deleteProduct(id: string): Promise<number> {
+  const res = await axios.delete(`http://localhost:5000/products/${id}`)
+  console.log(res.data)
+
+  if (res.status !== 200) {
+    console.log(res.status)
+    console.log(res.statusText)
+  }
+
+  return res.status
+}
+
+export async function updateProduct(id: string, data: ProductUpdate): Promise<number> {
+  const res = await axios.post(`http://localhost:5000/products/${id}`, data)
+
+  if (res.status !== 200) {
+    console.log(res.status)
+    console.log(res.statusText)
+  }
+
+  return res.status
+}
+
+export async function createProduct(data: ProductCreate): Promise<number> {
+  try {
+    const res = await axios.post('http://localhost:5000/products/', data)
+
+    if (res.status !== 200) {
+      console.log(res.status)
+      console.log(res.statusText)
+    }
+
+    return res.status
+  } catch (e) {
+    console.log(e)
+    return 500
+  }
 }

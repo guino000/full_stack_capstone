@@ -39,7 +39,7 @@ def create_product():
     new_description = body.get('description', None)
     new_cost = body.get('cost', None)
     new_size = body.get('size', None)
-    new_picture_urls = body.get('pictures', '').split(';')
+    new_picture_urls = body.get('pictures', '')
 
     try:
         product = Product(new_name, new_description, new_cost, new_size)

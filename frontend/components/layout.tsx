@@ -6,10 +6,12 @@ import ResponsiveAppBar from "./responsiveAppBar";
 export default function Layout({children}) {
   return (
     <Box>
-      <ResponsiveAppBar/>
-      <Container>
-        <main>{children}</main>
-      </Container>
+      <main>
+        <ResponsiveAppBar/>
+        <Container>
+          <main>{children}</main>
+        </Container>
+      </main>
     </Box>
   );
 }

@@ -1,13 +1,28 @@
-import {getAllProducts, Product} from "../lib/products";
-import React from "react";
-import ImageListItem from "@mui/material/ImageListItem";
-import ImageListItemBar from "@mui/material/ImageListItemBar";
-import ImageList from "@mui/material/ImageList";
+import {deleteProduct, getAllProducts, Product} from "../lib/products";
+import React, {useCallback} from "react";
 import Typography from "@mui/material/Typography";
-import {Container, Divider, Link, useMediaQuery, useTheme} from "@mui/material";
+import {
+  Avatar,
+  Container,
+  Divider,
+  Fab,
+  IconButton,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Stack,
+  useMediaQuery,
+  useTheme
+} from "@mui/material";
 import {UISpacer} from "../components/UISpacer";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
+import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 
-export async function getStaticProps() {
+// @ts-ignore
+export async function getStaticProps(context) {
   const productsData = await getAllProducts();
   return {
     props: {
@@ -25,86 +40,76 @@ function srcset(image: string, width: number, height: number, rows = 1, cols = 1
   };
 }
 
+const fabStyle = {
+  position: 'absolute',
+  bottom: 16,
+  right: 16,
+};
 
 export default function Products({productsData}: { productsData: Product[] }) {
   const theme = useTheme();
   const bigScreen = useMediaQuery(theme.breakpoints.up('sm'));
+  const [deleted, setDeleted] = React.useState(false)
+  const [products, setProducts] = React.useState<Product[]>(productsData)
+  const onDelete = useCallback(
+    async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: number) => {
+      const status = await deleteProduct(id.toString())
+      const products = await getAllProducts()
+      setProducts(products)
+      setDeleted(status === 200)
+    }, [])
 
   return (
     <>
       <UISpacer size={"big"}/>
-      <Typography align={"center"}>
-        Destaques
-      </Typography>
-      <UISpacer/>
-      <Divider/>
-      <Container>
-        <ImageList gap={1} cols={bigScreen ? 3 : 2}>
-          <ImageListItem key={"d1"}>
-            <img
-              {...srcset('https://img.xcitefun.net/users/2012/05/294731,xcitefun-a98185-catinpjs.jpg', 250, 250)}
-              alt={'Destaque 1'}
-              loading="lazy"
-            />
-            <ImageListItemBar
-              title={'Destaque 1'}
-              subtitle={<span>{'Destaque 1'}</span>}
-              position="below"
-            />
-          </ImageListItem>
-          <ImageListItem key={"d2"}>
-            <img
-              {...srcset('https://cdn.acidcow.com/content/img/new03/80/31.jpg', 250, 250)}
-              alt={'Destaque 2'}
-              loading="lazy"
-            />
-            <ImageListItemBar
-              title={'Destaque 2'}
-              subtitle={<span>{'Destaque 2'}</span>}
-              position="below"
-            />
-          </ImageListItem>
-          <ImageListItem key={"d3"} sx={{
-            display: {xs: 'none', md: 'flex'}
-          }}>
-            <img
-              {...srcset('https://cdn.acidcow.com/content/img/new03/80/30.jpg', 250, 250)}
-              alt={'Destaque 3'}
-              loading="lazy"
-            />
-            <ImageListItemBar
-              title={'Destaque 3'}
-              subtitle={<span>{'Destaque 3'}</span>}
-              position="below"
-            />
-          </ImageListItem>
-        </ImageList>
+      <Container maxWidth={"md"}>
+        <Stack direction={"row"} spacing={2} alignItems={"center"}>
+          <Typography align={"center"}>
+            Lista de Produtos
+          </Typography>
+          <IconButton aria-label="add" color={"success"} href={`/products/form`}>
+            <AddCircleOutlineRoundedIcon/>
+          </IconButton>
+        </Stack>
       </Container>
-      <UISpacer size={"big"}/>
-      <Typography align={"center"}>
-        Postagens Recentes
-      </Typography>
       <UISpacer/>
-      <Divider/>
-      <Container>
-        <ImageList gap={16} cols={bigScreen ? 4 : 2}>
-          {productsData.slice(0, 12).map((item) => (
-            <Link href={`/products/${item.id}`} color={'inherit'} underline="none">
-              <ImageListItem key={item.id}>
-                <img
-                  {...srcset('https://alittlecraftinyourday.com/wp-content/uploads/2016/11/IMG_9954.jpg', 250, 250)}
-                  alt={item.name}
-                  loading="lazy"
-                />
-                <ImageListItemBar
-                  title={item.name}
-                  subtitle={<span>{item.description}</span>}
-                  position="below"
-                />
-              </ImageListItem>
-            </Link>
+      <Container maxWidth={"md"}>
+        <Divider/>
+        <List>
+          {products.map((item) => (
+            <ListItem
+              key={item.id}
+              divider={true}
+              secondaryAction={<>
+                <IconButton edge="end" aria-label="edit" href={`/products/form`}>
+                  <EditIcon/>
+                </IconButton>
+                &nbsp;
+                &nbsp;
+                <IconButton edge="end" aria-label="delete" onClick={(e) => onDelete(e, item.id)}>
+                  <DeleteIcon/>
+                </IconButton>
+              </>
+              }
+            >
+              <ListItemAvatar>
+                <Avatar>
+                  <img src={item.pictures[0]?.url} alt={item.name}/>
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={item.name}
+                secondary={item.description}
+              />
+            </ListItem>
           ))}
-        </ImageList>
+        </List>
+        {
+          !bigScreen &&
+            <Fab color="primary" aria-label="add" sx={fabStyle}>
+                <AddIcon/>
+            </Fab>
+        }
       </Container>
     </>
   )
