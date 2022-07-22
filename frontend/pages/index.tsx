@@ -8,17 +8,21 @@ import {Container, Divider, Link, useMediaQuery, useTheme} from "@mui/material";
 import {UISpacer} from "../components/UISpacer";
 import axios from "axios";
 import {srcset} from "../lib/utils/srcset";
+import {getSession} from "@auth0/nextjs-auth0";
 
-export async function getStaticProps() {
+// @ts-ignore
+export async function getServerSideProps({req, res}) {
+  const session = getSession(req, res);
   const productsData = await axios.get('http://localhost:3000/api/products');
   return {
     props: {
+      roles: session?.user['http://demozero.net/roles'] || '',
       productsData: JSON.parse(productsData.data),
     },
   };
 }
 
-export default function Home({productsData}: { productsData: Product[] }) {
+export default function Home({productsData, roles}: { productsData: Product[], roles: string[] }) {
   const theme = useTheme();
   const bigScreen = useMediaQuery(theme.breakpoints.up('sm'));
 

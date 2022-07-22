@@ -21,10 +21,11 @@ type Page = {
   condition: boolean
 }
 
-const ResponsiveAppBar = () => {
+export default function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const {user} = useUser()
+  const roles = user ? (user['http://demozero.net/roles'] as string[]) : []
 
   const pages: Page[] = [
     {
@@ -35,7 +36,7 @@ const ResponsiveAppBar = () => {
     {
       name: 'Produtos',
       target: '/products',
-      condition: user !== undefined
+      condition: user !== undefined && roles.map(r => r.toLowerCase()).includes('manager')
     }
   ];
   const settings: Page[] = [
@@ -199,5 +200,4 @@ const ResponsiveAppBar = () => {
       </Container>
     </AppBar>
   );
-};
-export default ResponsiveAppBar;
+}

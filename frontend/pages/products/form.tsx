@@ -35,7 +35,7 @@ export type Inputs = {
   pictureUrls?: string[]
 }
 
-export default withPageAuthRequired(function ProductCreate() {
+export default withPageAuthRequired(function ProductCreate({user}) {
   const theme = useTheme();
   const bigScreen = useMediaQuery(theme.breakpoints.up('sm'));
   const router = useRouter()
