@@ -1,5 +1,6 @@
 import {ProductApiClient} from "../../../lib/products";
 import {NextApiRequest, NextApiResponse} from "next";
+import {getCircularReplacer} from "../../../lib/utils/getCircularReplacer";
 
 export default async function productDetailsApiHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -12,7 +13,7 @@ export default async function productDetailsApiHandler(req: NextApiRequest, res:
     if (req.method === 'GET') {
       console.log(req.body)
       const product = await client.getProduct(id.toString())
-      res.json(JSON.stringify(product))
+      res.json(JSON.stringify(product, getCircularReplacer))
       res.status(200).end()
     } else {
       res.status(405).end()
