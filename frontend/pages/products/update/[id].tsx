@@ -1,6 +1,8 @@
 import React, {useCallback} from "react";
 import {IDParam, Product} from "../../../lib/products";
 import {
+  Alert,
+  AlertTitle,
   Box,
   Container,
   Divider,
@@ -12,9 +14,7 @@ import {
   List,
   ListItem,
   ListItemText,
-  TextField,
-  useMediaQuery,
-  useTheme
+  TextField
 } from "@mui/material";
 import axios from "axios";
 import {withPageAuthRequired} from "@auth0/nextjs-auth0";
@@ -51,8 +51,6 @@ export async function getStaticProps({params}: IDParam) {
 }
 
 export default withPageAuthRequired(function ProductUpdate({productData}: { productData: Product }) {
-  const theme = useTheme();
-  const bigScreen = useMediaQuery(theme.breakpoints.up('sm'));
   const router = useRouter()
   console.log(router.query);
   const [loading, setLoading] = React.useState(false);
@@ -60,7 +58,7 @@ export default withPageAuthRequired(function ProductUpdate({productData}: { prod
   const [error, setError] = React.useState(false);
   const [pictures, setPictures] = React.useState<string[]>(productData?.pictures?.map(p => p.url) || [])
   const [picture, setPicture] = React.useState<string>('')
-  const {register, handleSubmit, watch, formState: {errors}, reset} = useForm<Inputs>()
+  const {register, handleSubmit, reset} = useForm<Inputs>()
 
   const onSubmit: SubmitHandler<Inputs> = useCallback(async (data) => {
     setLoading(true)
@@ -77,10 +75,12 @@ export default withPageAuthRequired(function ProductUpdate({productData}: { prod
         setError(true)
       }
       reset()
+      setPictures([])
+      await router.push('/')
     } catch (error) {
       setLoading(false)
       setError(true)
-      reset()
+      setSuccess(false)
     }
   }, [setLoading, pictures])
 
@@ -111,10 +111,11 @@ export default withPageAuthRequired(function ProductUpdate({productData}: { prod
           <TextField fullWidth label="Description" defaultValue={productData?.description}
                      variant="filled" {...register("description")}/>
           <UISpacer/>
-          <TextField fullWidth required label="Cost" defaultValue={productData?.cost}
+          <TextField fullWidth required label="Cost" type={"number"} defaultValue={productData?.cost}
                      variant="filled" {...register("cost")}/>
           <UISpacer/>
-          <TextField fullWidth label="Size" defaultValue={productData?.size} variant="filled" {...register("size")}/>
+          <TextField fullWidth label="Size" type={"number"} defaultValue={productData?.size}
+                     variant="filled" {...register("size")}/>
           <UISpacer/>
           <FormControl fullWidth variant={'filled'}>
             <InputLabel htmlFor={'picture-input'}>
@@ -128,7 +129,7 @@ export default withPageAuthRequired(function ProductUpdate({productData}: { prod
                 <InputAdornment position="end">
                   <IconButton
                     aria-label="add picture"
-                    onClick={(e) => addPicture()}
+                    onClick={() => addPicture()}
                     disabled={picture === ''}
                     edge="end"
                   >
@@ -145,7 +146,7 @@ export default withPageAuthRequired(function ProductUpdate({productData}: { prod
                 key={item}
                 divider={true}
                 secondaryAction={
-                  <IconButton edge="end" aria-label="delete" onClick={(e) => onDeletePicture(item)}>
+                  <IconButton edge="end" aria-label="delete" onClick={() => onDeletePicture(item)}>
                     <DeleteIcon/>
                   </IconButton>
                 }
@@ -156,6 +157,14 @@ export default withPageAuthRequired(function ProductUpdate({productData}: { prod
               </ListItem>
             ))}
           </List>
+          {error && (<><UISpacer/><Alert severity="error">
+            <AlertTitle>Erro</AlertTitle>
+            Erro! Não foi possível atualizar
+          </Alert></>)}
+          {success && (<><UISpacer/><UISpacer/><Alert severity="success">
+            <AlertTitle>Sucesso</AlertTitle>
+            Atualizado com sucesso!
+          </Alert></>)}
           <UISpacer size={"big"}/>
           <LoadingButton
             type='submit'

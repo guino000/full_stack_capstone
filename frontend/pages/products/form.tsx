@@ -1,6 +1,8 @@
 import {UISpacer} from "../../components/UISpacer";
 import Typography from "@mui/material/Typography";
 import {
+  Alert,
+  AlertTitle,
   Box,
   Container,
   Divider,
@@ -12,9 +14,7 @@ import {
   List,
   ListItem,
   ListItemText,
-  TextField,
-  useMediaQuery,
-  useTheme
+  TextField
 } from "@mui/material";
 import React, {useCallback} from "react";
 import {SubmitHandler, useForm} from "react-hook-form";
@@ -22,7 +22,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from '@mui/icons-material/Send';
 import {uniqForObject} from "../../lib/utils/uniqForObject";
 import {LoadingButton} from '@mui/lab'
-import {useRouter} from "next/router";
 import axios from "axios";
 import {withPageAuthRequired} from "@auth0/nextjs-auth0";
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
@@ -36,16 +35,12 @@ export type Inputs = {
 }
 
 export default withPageAuthRequired(function ProductCreate({user}) {
-  const theme = useTheme();
-  const bigScreen = useMediaQuery(theme.breakpoints.up('sm'));
-  const router = useRouter()
-  console.log(router.query);
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
   const [error, setError] = React.useState(false);
   const [pictures, setPictures] = React.useState<string[]>([])
   const [picture, setPicture] = React.useState<string>('')
-  const {register, handleSubmit, watch, formState: {errors}, reset} = useForm<Inputs>()
+  const {register, handleSubmit, reset} = useForm<Inputs>()
 
   const onSubmit: SubmitHandler<Inputs> = useCallback(async (data) => {
     setLoading(true)
@@ -62,9 +57,11 @@ export default withPageAuthRequired(function ProductCreate({user}) {
         setError(true)
       }
       reset()
+      setPictures([])
     } catch (error) {
       setLoading(false)
       setError(true)
+      setSuccess(false)
       reset()
     }
   }, [setLoading, pictures])
@@ -78,8 +75,6 @@ export default withPageAuthRequired(function ProductCreate({user}) {
     pictures.splice(pictures.indexOf(pic), 1)
     setPictures([...pictures])
   }, [pictures, setPictures])
-
-  //TODO: Upload images to cloud storage
 
   return (
     <Box>
@@ -96,9 +91,9 @@ export default withPageAuthRequired(function ProductCreate({user}) {
           <UISpacer/>
           <TextField fullWidth label="Descrição" variant="filled" {...register("description")}/>
           <UISpacer/>
-          <TextField required label="Valor" variant="filled" {...register("cost")}/>
+          <TextField required label="Valor" type={"number"} variant="filled" {...register("cost")}/>
           <UISpacer/>
-          <TextField label="Tamanho" variant="filled" {...register("size")}/>
+          <TextField label="Tamanho" type={"number"} variant="filled" {...register("size")}/>
           <UISpacer/>
           <FormControl fullWidth variant={'filled'}>
             <InputLabel htmlFor={'picture-input'}>
@@ -112,7 +107,7 @@ export default withPageAuthRequired(function ProductCreate({user}) {
                 <InputAdornment position="end">
                   <IconButton
                     aria-label="add picture"
-                    onClick={(e) => addPicture()}
+                    onClick={() => addPicture()}
                     disabled={picture === ''}
                     edge="end"
                   >
@@ -129,7 +124,7 @@ export default withPageAuthRequired(function ProductCreate({user}) {
                 key={item}
                 divider={true}
                 secondaryAction={
-                  <IconButton edge="end" aria-label="delete" onClick={(e) => onDeletePicture(item)}>
+                  <IconButton edge="end" aria-label="delete" onClick={() => onDeletePicture(item)}>
                     <DeleteIcon/>
                   </IconButton>
                 }
@@ -140,6 +135,14 @@ export default withPageAuthRequired(function ProductCreate({user}) {
               </ListItem>
             ))}
           </List>
+          {error && (<><UISpacer/><Alert severity="error">
+            <AlertTitle>Erro</AlertTitle>
+            Erro! Não foi possível adicionar
+          </Alert></>)}
+          {success && (<><UISpacer/><UISpacer/><Alert severity="success">
+            <AlertTitle>Sucesso</AlertTitle>
+            Adicionado com sucesso!
+          </Alert></>)}
           <UISpacer size={"big"}/>
           <LoadingButton
             type='submit'
