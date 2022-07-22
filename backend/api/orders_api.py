@@ -64,7 +64,7 @@ def create_order():
         abort(422)
 
 
-@orders_api.route('/<int:order_id>', methods=['POST'])
+@orders_api.route('/<int:order_id>', methods=['PATCH'])
 def update_order(order_id):
     body = request.get_json()
     new_status = body.get('status')
