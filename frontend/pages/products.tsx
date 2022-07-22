@@ -20,7 +20,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
-import {withPageAuthRequired} from "@auth0/nextjs-auth0";
+import {useUser, withPageAuthRequired} from "@auth0/nextjs-auth0";
 import axios from "axios";
 
 // @ts-ignore
@@ -53,6 +53,9 @@ export default withPageAuthRequired(function Products({productsData}: { products
   const bigScreen = useMediaQuery(theme.breakpoints.up('sm'));
   const [deleted, setDeleted] = React.useState(false)
   const [products, setProducts] = React.useState<Product[]>(productsData)
+  const {user} = useUser()
+  const roles = (user ? (user['http://demozero.net/roles'] as string[]) : []).map(r => r.toLowerCase())
+
   const onDelete = useCallback(
     async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: number) => {
       try {
@@ -73,9 +76,10 @@ export default withPageAuthRequired(function Products({productsData}: { products
           <Typography align={"center"}>
             Lista de Produtos
           </Typography>
-          <IconButton aria-label="add" color={"success"} href={`/products/form`}>
-            <AddCircleOutlineRoundedIcon/>
-          </IconButton>
+          {roles.includes('manager') &&
+            (<IconButton aria-label="add" color={"success"} href={`/products/form`}>
+              <AddCircleOutlineRoundedIcon/>
+            </IconButton>)}
         </Stack>
       </Container>
       <UISpacer/>
@@ -90,11 +94,14 @@ export default withPageAuthRequired(function Products({productsData}: { products
                 <IconButton edge="end" aria-label="edit" href={`/products/update/${item.id}`}>
                   <EditIcon/>
                 </IconButton>
-                &nbsp;
-                &nbsp;
-                <IconButton edge="end" aria-label="delete" onClick={(e) => onDelete(e, item.id)}>
-                  <DeleteIcon/>
-                </IconButton>
+                {roles.includes('manager') && (<>
+                    &nbsp;
+                    &nbsp;
+                    <IconButton edge="end" aria-label="delete" onClick={(e) => onDelete(e, item.id)}>
+                      <DeleteIcon/>
+                    </IconButton>
+                  </>
+                )}
               </>
               }
             >

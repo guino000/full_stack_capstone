@@ -25,7 +25,7 @@ export default function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const {user} = useUser()
-  const roles = user ? (user['http://demozero.net/roles'] as string[]) : []
+  const roles = (user ? (user['http://demozero.net/roles'] as string[]) : []).map(r => r.toLowerCase())
 
   const pages: Page[] = [
     {
@@ -36,7 +36,8 @@ export default function ResponsiveAppBar() {
     {
       name: 'Produtos',
       target: '/products',
-      condition: user !== undefined && roles.map(r => r.toLowerCase()).includes('manager')
+      condition: user !== undefined
+        && (roles.includes('manager') || roles.includes('maintainer'))
     }
   ];
   const settings: Page[] = [
