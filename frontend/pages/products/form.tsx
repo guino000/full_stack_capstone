@@ -4,7 +4,11 @@ import {
   Box,
   Container,
   Divider,
+  FilledInput,
+  FormControl,
   IconButton,
+  InputAdornment,
+  InputLabel,
   List,
   ListItem,
   ListItemText,
@@ -12,7 +16,7 @@ import {
   useMediaQuery,
   useTheme
 } from "@mui/material";
-import React, {ChangeEvent, useCallback} from "react";
+import React, {useCallback} from "react";
 import {SubmitHandler, useForm} from "react-hook-form";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from '@mui/icons-material/Send';
@@ -21,6 +25,7 @@ import {LoadingButton} from '@mui/lab'
 import {useRouter} from "next/router";
 import axios from "axios";
 import {withPageAuthRequired} from "@auth0/nextjs-auth0";
+import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 
 export type Inputs = {
   name: string,
@@ -64,10 +69,10 @@ export default withPageAuthRequired(function ProductCreate() {
     }
   }, [setLoading, pictures])
 
-  const onPictureChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setPictures(uniqForObject([...pictures, e.target.value]))
+  const addPicture = useCallback(() => {
+    setPictures(uniqForObject([...pictures, picture]))
     setPicture('')
-  }, [pictures, setPictures, setPicture])
+  }, [picture, pictures, setPictures, setPicture])
 
   const onDeletePicture = useCallback((pic: string) => {
     pictures.splice(pictures.indexOf(pic), 1)
@@ -87,20 +92,36 @@ export default withPageAuthRequired(function ProductCreate() {
       <UISpacer size={"big"}/>
       <Container maxWidth={'md'}>
         <Box component={"form"} onSubmit={handleSubmit(onSubmit)}>
-          <TextField fullWidth required label="Name" variant="filled" {...register("name")}/>
+          <TextField fullWidth required label="Nome" variant="filled" {...register("name")}/>
           <UISpacer/>
-          <TextField fullWidth label="Description" variant="filled" {...register("description")}/>
+          <TextField fullWidth label="Descrição" variant="filled" {...register("description")}/>
           <UISpacer/>
-          <TextField fullWidth required label="Cost" variant="filled" {...register("cost")}/>
+          <TextField required label="Valor" variant="filled" {...register("cost")}/>
           <UISpacer/>
-          <TextField fullWidth label="Size" variant="filled" {...register("size")}/>
+          <TextField label="Tamanho" variant="filled" {...register("size")}/>
           <UISpacer/>
-          <Typography>
-            Adicionar Foto
-          </Typography>
-          <UISpacer size="small"/>
-          <input id={"picture-input"} value={picture} type="file" accept="image/*;capture=camera"
-                 onChange={(e) => onPictureChange(e)}/>
+          <FormControl fullWidth variant={'filled'}>
+            <InputLabel htmlFor={'picture-input'}>
+              Adicionar URL de Foto
+            </InputLabel>
+            <FilledInput
+              id={"picture-input"}
+              value={picture}
+              onChange={(e) => setPicture(e.target.value)}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="add picture"
+                    onClick={(e) => addPicture()}
+                    disabled={picture === ''}
+                    edge="end"
+                  >
+                    <AddCircleOutlineRoundedIcon/>
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
+          </FormControl>
           <UISpacer/>
           <List>
             {pictures.map((item) => (

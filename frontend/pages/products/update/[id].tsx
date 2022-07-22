@@ -1,10 +1,14 @@
-import React, {ChangeEvent, useCallback} from "react";
+import React, {useCallback} from "react";
 import {IDParam, Product} from "../../../lib/products";
 import {
   Box,
   Container,
   Divider,
+  FilledInput,
+  FormControl,
   IconButton,
+  InputAdornment,
+  InputLabel,
   List,
   ListItem,
   ListItemText,
@@ -23,6 +27,7 @@ import Typography from "@mui/material/Typography";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {LoadingButton} from "@mui/lab";
 import SendIcon from "@mui/icons-material/Send";
+import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
 
 export async function getStaticPaths() {
   const res = await axios.get(`http://localhost:3000/api/products`)
@@ -79,10 +84,10 @@ export default withPageAuthRequired(function ProductUpdate({productData}: { prod
     }
   }, [setLoading, pictures])
 
-  const onPictureChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    setPictures(uniqForObject([...pictures, e.target.value]))
+  const addPicture = useCallback(() => {
+    setPictures(uniqForObject([...pictures, picture]))
     setPicture('')
-  }, [pictures, setPictures, setPicture])
+  }, [picture, pictures, setPictures, setPicture])
 
   const onDeletePicture = useCallback((pic: string) => {
     pictures.splice(pictures.indexOf(pic), 1)
@@ -111,12 +116,28 @@ export default withPageAuthRequired(function ProductUpdate({productData}: { prod
           <UISpacer/>
           <TextField fullWidth label="Size" defaultValue={productData?.size} variant="filled" {...register("size")}/>
           <UISpacer/>
-          <Typography>
-            Adicionar Foto
-          </Typography>
-          <UISpacer size="small"/>
-          <input id={"picture-input"} value={picture} type="file" accept="image/*;capture=camera"
-                 onChange={(e) => onPictureChange(e)}/>
+          <FormControl fullWidth variant={'filled'}>
+            <InputLabel htmlFor={'picture-input'}>
+              Adicionar URL de Foto
+            </InputLabel>
+            <FilledInput
+              id={"picture-input"}
+              value={picture}
+              onChange={(e) => setPicture(e.target.value)}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="add picture"
+                    onClick={(e) => addPicture()}
+                    disabled={picture === ''}
+                    edge="end"
+                  >
+                    <AddCircleOutlineRoundedIcon/>
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
+          </FormControl>
           <UISpacer/>
           <List>
             {pictures.map((item) => (

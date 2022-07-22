@@ -34,7 +34,7 @@ def get_product_details(product_id):
 
 @products_api.route('/', methods=['POST'])
 @requires_auth('post:products')
-def create_product():
+def create_product(self):
     body = request.get_json()
 
     new_name = body.get('name', None)

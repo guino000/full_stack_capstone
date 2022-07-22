@@ -12,79 +12,49 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-import SearchIcon from '@mui/icons-material/Search';
-import {alpha, InputBase, styled} from "@mui/material";
 import Link from "next/link";
+import {useUser} from "@auth0/nextjs-auth0";
 
 type Page = {
   name: string,
-  target: string
+  target: string,
+  condition: boolean
 }
-
-const pages: Page[] = [
-  {
-    name: 'Produtos',
-    target: '/products'
-  }
-];
-const settings: Page[] = [
-  {
-    name: 'Login',
-    target: '/api/auth/login'
-  },
-  {
-    name: 'Meu Perfil',
-    target: '/profile'
-  },
-  {
-    name: 'Sair',
-    target: '/api/auth/logout'
-  },
-];
-
-const Search = styled('div')(({theme}) => ({
-  position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(3),
-    width: 'auto',
-  },
-}));
-
-const SearchIconWrapper = styled('div')(({theme}) => ({
-  padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({theme}) => ({
-  color: 'inherit',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '20ch',
-    },
-  },
-}));
 
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+  const {user} = useUser()
+
+  const pages: Page[] = [
+    {
+      name: 'Inicio',
+      target: '/',
+      condition: true
+    },
+    {
+      name: 'Produtos',
+      target: '/products',
+      condition: user !== undefined
+    }
+  ];
+  const settings: Page[] = [
+    {
+      name: 'Login',
+      target: '/api/auth/login',
+      condition: user === undefined
+    },
+    {
+      name: 'Meu Perfil',
+      target: '/profile',
+      condition: user !== undefined
+    },
+    {
+      name: 'Sair',
+      target: '/api/auth/logout',
+      condition: user !== undefined
+    },
+  ];
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -111,6 +81,7 @@ const ResponsiveAppBar = () => {
             noWrap
             component="a"
             href={'/'}
+            onClick={handleCloseNavMenu}
             sx={{
               mr: 2,
               display: {xs: 'none', md: 'flex'},
@@ -147,15 +118,16 @@ const ResponsiveAppBar = () => {
                 horizontal: 'left',
               }}
               open={Boolean(anchorElNav)}
+              onClick={handleCloseNavMenu}
               onClose={handleCloseNavMenu}
               sx={{
                 display: {xs: 'block', md: 'none'},
               }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page.name}>
-                  <Link href={page.target}><Typography textAlign="center">{page.name}</Typography></Link>
-                </MenuItem>
+              {pages.map((page) => (page.condition && (
+                  <MenuItem key={page.name}>
+                    <Link href={page.target}><Typography textAlign="center">{page.name}</Typography></Link>
+                  </MenuItem>)
               ))}
             </Menu>
           </Box>
@@ -179,7 +151,7 @@ const ResponsiveAppBar = () => {
             LOGO
           </Typography>
           <Box sx={{flexGrow: 0, display: {xs: 'none', md: 'flex'}}}>
-            {pages.map((page) => (
+            {pages.map((page) => (page.condition && (
               <Button
                 key={page.name}
                 href={page.target}
@@ -187,24 +159,13 @@ const ResponsiveAppBar = () => {
               >
                 {page.name}
               </Button>
-            ))}
-          </Box>
-          <Box sx={{flexGrow: 1}}>
-            <Search>
-              <SearchIconWrapper>
-                <SearchIcon/>
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder="Search…"
-                inputProps={{'aria-label': 'search'}}
-              />
-            </Search>
+            )))}
           </Box>
           <Box sx={{flexGrow: 1}}/>
           <Box sx={{flexGrow: 0}}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg"/>
+                <Avatar alt="Remy Sharp" src={user?.picture || ''}/>
               </IconButton>
             </Tooltip>
             <Menu
@@ -223,14 +184,14 @@ const ResponsiveAppBar = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting.name}>
-                  <Link href={setting.target}>
-                    <Typography textAlign="center">
-                      {setting.name}
-                    </Typography>
-                  </Link>
-                </MenuItem>
+              {settings.map((setting) => (setting.condition && (
+                  <MenuItem key={setting.name}>
+                    <Link href={setting.target}>
+                      <Typography textAlign="center" onClick={handleCloseUserMenu}>
+                        {setting.name}
+                      </Typography>
+                    </Link>
+                  </MenuItem>)
               ))}
             </Menu>
           </Box>
