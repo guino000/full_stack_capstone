@@ -1,6 +1,9 @@
 {
-    "scripts": {
-      "heroku-prebuild": "cd frontend && npm i && npm run build && cd .. && cd backend && pipenv install",
-      "start": "cd backend && gunicorn app:app && cd .. && cd frontend && npm start"
-    }
+  "scripts": {
+    "heroku-prebuild": "cd frontend && npm i && npm run build && cd .. && cd backend && pipenv install",
+    "start": "cd backend && gunicorn app:app && cd .. && cd frontend && npm start"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4"
   }
+}
