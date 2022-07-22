@@ -9,6 +9,7 @@ import {UISpacer} from "../components/UISpacer";
 import axios from "axios";
 import {srcset} from "../lib/utils/srcset";
 import {getSession} from "@auth0/nextjs-auth0";
+import Flatted from "flatted";
 
 // @ts-ignore
 export async function getServerSideProps({req, res}) {
@@ -17,12 +18,12 @@ export async function getServerSideProps({req, res}) {
   return {
     props: {
       roles: session?.user['http://demozero.net/roles'] || '',
-      productsData: JSON.parse(productsData.data),
+      productsData: Flatted.parse(productsData.data),
     },
   };
 }
 
-export default function Home({productsData, roles}: { productsData: Product[], roles: string[] }) {
+export default function Home({productsData}: { productsData: Product[], roles: string[] }) {
   const theme = useTheme();
   const bigScreen = useMediaQuery(theme.breakpoints.up('sm'));
 

@@ -4,10 +4,11 @@ import {Card, CardContent, CardHeader, Container, Grid, Typography} from "@mui/m
 import axios from "axios";
 import {srcset} from "../../lib/utils/srcset";
 import {UISpacer} from "../../components/UISpacer";
+import Flatted from "flatted";
 
 export async function getStaticPaths() {
   const res = await axios.get(`http://localhost:3000/api/products`)
-  const products = JSON.parse(res.data)
+  const products = Flatted.parse(res.data)
   const paths = products.map((p: Product) => {
     return {params: {id: p.id.toString()}}
   })
@@ -21,7 +22,7 @@ export async function getStaticProps({params}: IDParam) {
   const res = await axios.get(`http://localhost:3000/api/productdetails/${params.id}`)
   return {
     props: {
-      productData: JSON.parse(res.data),
+      productData: Flatted.parse(res.data),
     },
   };
 }

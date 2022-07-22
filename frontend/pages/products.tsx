@@ -22,23 +22,15 @@ import AddIcon from '@mui/icons-material/Add';
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 import {useUser, withPageAuthRequired} from "@auth0/nextjs-auth0";
 import axios from "axios";
+import Flatted from "flatted";
 
 // @ts-ignore
-export async function getStaticProps(context) {
+export async function getStaticProps() {
   const res = await axios.get(`http://localhost:3000/api/products`)
   return {
     props: {
-      productsData: JSON.parse(res.data),
+      productsData: Flatted.parse(res.data),
     },
-  };
-}
-
-function srcset(image: string, width: number, height: number, rows = 1, cols = 1) {
-  return {
-    src: `${image}?w=${width * cols}&h=${height * rows}&fit=crop&auto=format`,
-    srcSet: `${image}?w=${width * cols}&h=${
-      height * rows
-    }&fit=crop&auto=format&dpr=2 2x`,
   };
 }
 
@@ -61,7 +53,7 @@ export default withPageAuthRequired(function Products({productsData}: { products
       try {
         const res = await axios.delete(`http://localhost:3000/api/products/${id}`)
         const productsRes = await axios.get(`http://localhost:3000/api/products`)
-        setProducts(JSON.parse(productsRes.data))
+        setProducts(Flatted.parse(productsRes.data))
         setDeleted(res.status === 200)
       } catch (error) {
         console.log(error)
