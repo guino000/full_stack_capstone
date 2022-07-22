@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, jsonify
 
 from api.cart_api import cart_api
 from api.orders_api import orders_api
@@ -20,22 +20,55 @@ def create_app(test_config=None):
     app.register_blueprint(cart_api, url_prefix='/users')
     app.register_blueprint(orders_api, url_prefix='/orders')
 
-    @app.route('/')
-    def get_greeting():
-        excited = os.environ['EXCITED']
-        greeting = "Hello"
-        if excited == 'true':
-            greeting = greeting + "!!!!! You are doing great in this Udacity project."
-        return greeting
-
-    @app.route('/coolkids')
-    def be_cool():
-        return "Be cool, man, be coooool! You're almost a FSND grad!"
-
     return app
 
 
 app = create_app()
+
+@app.errorhandler(422)
+def unprocessable(error):
+    return jsonify({
+        "success": False,
+        "error": 422,
+        "message": f"unprocessable: {error}"
+    }), 422
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+        'success': False,
+        'error': 404,
+        'message': 'resource not found'
+    }), 404
+
+
+@app.errorhandler(400)
+def invalid_claims(error):
+    return jsonify({
+        'success': False,
+        'error': 400,
+        'message': 'invalid claims'
+    }), 400
+
+
+@app.errorhandler(403)
+def unauthorized(error):
+    return jsonify({
+        'success': False,
+        'error': 403,
+        'message': 'unauthorized'
+    }), 403
+
+
+@app.errorhandler(401)
+def unauthorized(error):
+    return jsonify({
+        'success': False,
+        'error': 401,
+        'message': 'unauthorized'
+    }), 401
+
 
 if __name__ == '__main__':
     app.run()

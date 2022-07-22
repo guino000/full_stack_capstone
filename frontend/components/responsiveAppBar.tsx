@@ -14,6 +14,7 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import SearchIcon from '@mui/icons-material/Search';
 import {alpha, InputBase, styled} from "@mui/material";
+import Link from "next/link";
 
 type Page = {
   name: string,
@@ -26,7 +27,20 @@ const pages: Page[] = [
     target: '/products'
   }
 ];
-const settings = ['Minha Conta', 'Carrinho', 'Sair'];
+const settings: Page[] = [
+  {
+    name: 'Login',
+    target: '/api/auth/login'
+  },
+  {
+    name: 'Meu Perfil',
+    target: '/profile'
+  },
+  {
+    name: 'Sair',
+    target: '/api/auth/logout'
+  },
+];
 
 const Search = styled('div')(({theme}) => ({
   position: 'relative',
@@ -96,7 +110,7 @@ const ResponsiveAppBar = () => {
             variant="h6"
             noWrap
             component="a"
-            href="/"
+            href={'/'}
             sx={{
               mr: 2,
               display: {xs: 'none', md: 'flex'},
@@ -139,8 +153,8 @@ const ResponsiveAppBar = () => {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page.name} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page.name}</Typography>
+                <MenuItem key={page.name}>
+                  <Link href={page.target}><Typography textAlign="center">{page.name}</Typography></Link>
                 </MenuItem>
               ))}
             </Menu>
@@ -150,7 +164,7 @@ const ResponsiveAppBar = () => {
             variant="h5"
             noWrap
             component="a"
-            href=""
+            href="/"
             sx={{
               mr: 2,
               display: {xs: 'flex', md: 'none'},
@@ -169,7 +183,6 @@ const ResponsiveAppBar = () => {
               <Button
                 key={page.name}
                 href={page.target}
-                onClick={handleCloseNavMenu}
                 sx={{my: 2, color: 'white', display: 'block'}}
               >
                 {page.name}
@@ -211,8 +224,12 @@ const ResponsiveAppBar = () => {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
+                <MenuItem key={setting.name}>
+                  <Link href={setting.target}>
+                    <Typography textAlign="center">
+                      {setting.name}
+                    </Typography>
+                  </Link>
                 </MenuItem>
               ))}
             </Menu>

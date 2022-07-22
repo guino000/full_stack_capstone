@@ -22,7 +22,9 @@ python-dateutil = "==2.8.1"
 python-editor = "==1.0.4"
 six = "==1.16.0"
 sqlalchemy = "==1.4.18"
-werkzeug = "==2.0.1"
+werkzeug = "==2.0.3"
+pycryptodome = "3.14.1"
+jose = "*"
 
 [dev-packages]
 

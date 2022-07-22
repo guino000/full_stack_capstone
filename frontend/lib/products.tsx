@@ -35,54 +35,43 @@ export type IDParam = {
   params: { id: string }
 }
 
-export async function getAllProducts(): Promise<Product[]> {
-  const res = await fetch('http://localhost:5000/products/')
-  const data = await res.json()
-  return data.products
-}
+export class ProductApiClient {
+  token: string
+  authHeader: string
+  baseUrl: string
 
-export async function getAllProductIds(): Promise<IDParam[]> {
-  const res = await fetch('http://localhost:5000/products/')
-  const data = await res.json()
-  console.log(data)
-  return data['products'].map((p: Product) => {
-    return {params: {id: p.id.toString()}}
-  })
-}
-
-export async function getProduct(id: string): Promise<Product[]> {
-  const res = await fetch(`http://localhost:5000/products/${id}`)
-  const data = await res.json()
-  console.log(data)
-  return data['product']
-}
-
-export async function deleteProduct(id: string): Promise<number> {
-  const res = await axios.delete(`http://localhost:5000/products/${id}`)
-  console.log(res.data)
-
-  if (res.status !== 200) {
-    console.log(res.status)
-    console.log(res.statusText)
+  constructor(token: string) {
+    this.token = token
+    this.authHeader = `Bearer ${token}`
+    this.baseUrl = 'http://localhost:5000'
   }
 
-  return res.status
-}
-
-export async function updateProduct(id: string, data: ProductUpdate): Promise<number> {
-  const res = await axios.post(`http://localhost:5000/products/${id}`, data)
-
-  if (res.status !== 200) {
-    console.log(res.status)
-    console.log(res.statusText)
+  async getAllProducts(): Promise<Product[]> {
+    const res = await axios.get(`${this.baseUrl}/products/`)
+    return res.data.products
   }
 
-  return res.status
-}
+  async getAllProductIds(): Promise<IDParam[]> {
+    const res = await axios.get(`${this.baseUrl}/products/`)
+    console.log(res.data)
+    return res.data['products'].map((p: Product) => {
+      return {params: {id: p.id.toString()}}
+    })
+  }
 
-export async function createProduct(data: ProductCreate): Promise<number> {
-  try {
-    const res = await axios.post('http://localhost:5000/products/', data)
+  async getProduct(id: string): Promise<Product[]> {
+    const res = await axios.get(`${this.baseUrl}/products/${id}`)
+    console.log(res.data)
+    return res.data['product']
+  }
+
+  async deleteProduct(id: string): Promise<number> {
+    const res = await axios.delete(`${this.baseUrl}/products/${id}`, {
+      headers: {
+        Authorization: this.authHeader
+      }
+    })
+    console.log(res.data)
 
     if (res.status !== 200) {
       console.log(res.status)
@@ -90,8 +79,43 @@ export async function createProduct(data: ProductCreate): Promise<number> {
     }
 
     return res.status
-  } catch (e) {
-    console.log(e)
-    return 500
   }
+
+  async updateProduct(id: string, data: ProductUpdate): Promise<number> {
+    const res = await axios.patch(`${this.baseUrl}/products/${id}`, data, {
+      headers: {
+        Authorization: this.authHeader
+      }
+    })
+
+    if (res.status !== 200) {
+      console.log(res.status)
+      console.log(res.statusText)
+    }
+
+    return res.status
+  }
+
+  async createProduct(data: ProductCreate): Promise<number> {
+    try {
+      console.log(this.authHeader)
+      console.log(this.token)
+      const res = await axios.post(`${this.baseUrl}/products/`, data, {
+        headers: {
+          Authorization: this.authHeader
+        }
+      })
+
+      if (res.status !== 200) {
+        console.log(res.status)
+        console.log(res.statusText)
+      }
+
+      return res.status
+    } catch (e) {
+      console.log(e)
+      return 500
+    }
+  }
+
 }

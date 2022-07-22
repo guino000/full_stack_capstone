@@ -1,4 +1,4 @@
-import {deleteProduct, getAllProducts, Product} from "../lib/products";
+import {Product} from "../lib/products";
 import React, {useCallback} from "react";
 import Typography from "@mui/material/Typography";
 import {
@@ -20,13 +20,15 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
+import {withPageAuthRequired} from "@auth0/nextjs-auth0";
+import axios from "axios";
 
 // @ts-ignore
 export async function getStaticProps(context) {
-  const productsData = await getAllProducts();
+  const res = await axios.get(`http://localhost:3000/api/products`)
   return {
     props: {
-      productsData,
+      productsData: JSON.parse(res.data),
     },
   };
 }
@@ -46,18 +48,22 @@ const fabStyle = {
   right: 16,
 };
 
-export default function Products({productsData}: { productsData: Product[] }) {
+export default withPageAuthRequired(function Products({productsData}: { productsData: Product[] }) {
   const theme = useTheme();
   const bigScreen = useMediaQuery(theme.breakpoints.up('sm'));
   const [deleted, setDeleted] = React.useState(false)
   const [products, setProducts] = React.useState<Product[]>(productsData)
   const onDelete = useCallback(
     async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: number) => {
-      const status = await deleteProduct(id.toString())
-      const products = await getAllProducts()
-      setProducts(products)
-      setDeleted(status === 200)
-    }, [])
+      try {
+        const res = await axios.delete(`http://localhost:3000/api/products/${id}`)
+        const productsRes = await axios.get(`http://localhost:3000/api/products`)
+        setProducts(JSON.parse(productsRes.data))
+        setDeleted(res.status === 200)
+      } catch (error) {
+        console.log(error)
+      }
+    }, [setProducts, setDeleted])
 
   return (
     <>
@@ -81,7 +87,7 @@ export default function Products({productsData}: { productsData: Product[] }) {
               key={item.id}
               divider={true}
               secondaryAction={<>
-                <IconButton edge="end" aria-label="edit" href={`/products/form`}>
+                <IconButton edge="end" aria-label="edit" href={`/products/update/${item.id}`}>
                   <EditIcon/>
                 </IconButton>
                 &nbsp;
@@ -113,4 +119,4 @@ export default function Products({productsData}: { productsData: Product[] }) {
       </Container>
     </>
   )
-}
+})

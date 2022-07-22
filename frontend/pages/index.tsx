@@ -1,4 +1,4 @@
-import {getAllProducts, Product} from "../lib/products";
+import {Product} from "../lib/products";
 import React from "react";
 import ImageListItem from "@mui/material/ImageListItem";
 import ImageListItemBar from "@mui/material/ImageListItemBar";
@@ -6,12 +6,13 @@ import ImageList from "@mui/material/ImageList";
 import Typography from "@mui/material/Typography";
 import {Container, Divider, Link, useMediaQuery, useTheme} from "@mui/material";
 import {UISpacer} from "../components/UISpacer";
+import axios from "axios";
 
 export async function getStaticProps() {
-  const productsData = await getAllProducts();
+  const productsData = await axios.get('http://localhost:3000/api/products');
   return {
     props: {
-      productsData,
+      productsData: JSON.parse(productsData.data),
     },
   };
 }

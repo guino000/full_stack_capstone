@@ -18,10 +18,11 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SendIcon from '@mui/icons-material/Send';
 import {uniqForObject} from "../../lib/utils/uniqForObject";
 import {LoadingButton} from '@mui/lab'
-import {createProduct} from "../../lib/products";
 import {useRouter} from "next/router";
+import axios from "axios";
+import {withPageAuthRequired} from "@auth0/nextjs-auth0";
 
-type Inputs = {
+export type Inputs = {
   name: string,
   description?: string,
   cost?: number,
@@ -29,7 +30,7 @@ type Inputs = {
   pictureUrls?: string[]
 }
 
-export default function ProductForm() {
+export default withPageAuthRequired(function ProductCreate() {
   const theme = useTheme();
   const bigScreen = useMediaQuery(theme.breakpoints.up('sm'));
   const router = useRouter()
@@ -44,17 +45,23 @@ export default function ProductForm() {
   const onSubmit: SubmitHandler<Inputs> = useCallback(async (data) => {
     setLoading(true)
     console.log(data)
-    const res = await createProduct({
-      ...data,
-      pictures: pictures
-    })
-    setLoading(false)
-    if (res === 200) {
-      setSuccess(true)
-    } else {
+    try {
+      const res = await axios.post('http://localhost:3000/api/products/create', {
+        ...data,
+        pictures: pictures
+      })
+      setLoading(false)
+      if (res.status === 200) {
+        setSuccess(true)
+      } else {
+        setError(true)
+      }
+      reset()
+    } catch (error) {
+      setLoading(false)
       setError(true)
+      reset()
     }
-    reset()
   }, [setLoading, pictures])
 
   const onPictureChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -124,4 +131,4 @@ export default function ProductForm() {
       </Container>
     </Box>
   )
-}
+})

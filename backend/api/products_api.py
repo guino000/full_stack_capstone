@@ -2,6 +2,7 @@ import os
 
 from flask import jsonify, abort, request, Blueprint
 
+from auth import requires_auth
 from models import Product, ProductPicture, db
 
 products_api = Blueprint('products_api', __name__)
@@ -32,6 +33,7 @@ def get_product_details(product_id):
 
 
 @products_api.route('/', methods=['POST'])
+@requires_auth('post:products')
 def create_product():
     body = request.get_json()
 
@@ -59,7 +61,8 @@ def create_product():
 
 
 @products_api.route('/<int:product_id>', methods=['PATCH'])
-def update_product(product_id):
+@requires_auth('patch:products')
+def update_product(self, product_id):
     product = Product.query.filter(Product.id == product_id).one_or_none()
 
     if product is None:
@@ -70,7 +73,7 @@ def update_product(product_id):
     new_description = body.get('description', None)
     new_cost = body.get('cost', None)
     new_size = body.get('size', None)
-    new_picture_urls = body.get('pictures', '').split(';')
+    new_picture_urls = body.get('pictures', '')
 
     try:
         if new_name:
@@ -97,7 +100,8 @@ def update_product(product_id):
 
 
 @products_api.route('/<int:product_id>', methods=['DELETE'])
-def delete_product(product_id):
+@requires_auth('delete:products')
+def delete_product(self, product_id):
     product = Product.query.filter(Product.id == product_id).one_or_none()
 
     if product is None:
