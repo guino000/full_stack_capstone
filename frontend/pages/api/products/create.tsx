@@ -8,7 +8,7 @@ export default withApiAuthRequired(async function productCreateApiHandler(req, r
     });
 
     if (accessToken === undefined) {
-      res.status(401).end('Could not get access token')
+      await res.status(401).end('Could not get access token')
       return
     }
 
@@ -17,14 +17,14 @@ export default withApiAuthRequired(async function productCreateApiHandler(req, r
     if (req.method === 'POST') {
       console.log(req.body)
       const status = await client.createProduct(req.body)
-      res.status(status).end()
+      await res.status(status).end()
     } else {
-      res.status(405).end()
+      await res.status(405).end()
     }
   } catch (error) {
     console.error(error)
     // @ts-ignore
-    res.status(error.status || 500).end(error.message)
+    await res.status(error.status || 500).end(error.message)
     return
   }
 })

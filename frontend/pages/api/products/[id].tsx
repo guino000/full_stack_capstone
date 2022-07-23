@@ -5,7 +5,7 @@ export default withApiAuthRequired(async function productCreateApiHandler(req, r
   try {
     const {id} = req.query
     if (id === undefined) {
-      res.status(500).end()
+      await res.status(500).end()
       return
     }
     if (req.method === 'DELETE') {
@@ -13,30 +13,30 @@ export default withApiAuthRequired(async function productCreateApiHandler(req, r
         scopes: ['delete:products']
       });
       if (accessToken === undefined) {
-        res.status(401).end('Could not get access token')
+        await res.status(401).end('Could not get access token')
         return
       }
       const client = new ProductApiClient(accessToken);
       const status = await client.deleteProduct(id.toString())
-      res.status(status).end()
+      await res.status(status).end()
     } else if (req.method === 'PATCH') {
       const {accessToken} = await getAccessToken(req, res, {
         scopes: ['patch:products']
       });
       if (accessToken === undefined) {
-        res.status(401).end('Could not get access token')
+        await res.status(401).end('Could not get access token')
         return
       }
       const client = new ProductApiClient(accessToken);
       const status = await client.updateProduct(id.toString(), req.body)
-      res.status(status).end()
+      await res.status(status).end()
     } else {
-      res.status(405).end()
+      await res.status(405).end()
     }
   } catch (error) {
     console.error(error)
     // @ts-ignore
-    res.status(error.status || 500).end(error.message)
+    await res.status(error.status || 500).end(error.message)
     return
   }
 })

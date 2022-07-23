@@ -10,14 +10,14 @@ export default async function productApiHandler(req: NextApiRequest, res: NextAp
     if (req.method === 'GET') {
       const products = await client.getAllProducts()
       const data = Flatted.stringify(products, getCircularReplacer)
-      res.json(data)
-      res.status(200).end()
+      await res.json(data)
+      await res.status(200).end()
     } else {
-      res.status(405).end()
+      await res.status(405).end()
     }
   } catch (error) {
     console.error(error)
     // @ts-ignore
-    res.status(error.status || 500).end(error.message)
+    await res.status(error.status || 500).end(error.message)
   }
 }

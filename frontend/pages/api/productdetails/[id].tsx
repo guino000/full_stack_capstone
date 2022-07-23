@@ -8,21 +8,21 @@ export default async function productDetailsApiHandler(req: NextApiRequest, res:
     const client = new ProductApiClient('');
     const {id} = req.query
     if (id === undefined) {
-      res.status(500).end()
+      await res.status(500).end()
       return
     }
     if (req.method === 'GET') {
       const product = await client.getProduct(id.toString())
       const data = Flatted.stringify(product, getCircularReplacer)
-      res.json(data)
-      res.status(200).end()
+      await res.json(data)
+      await res.status(200).end()
     } else {
-      res.status(405).end()
+      await res.status(405).end()
     }
   } catch (error) {
     console.error(error)
     // @ts-ignore
-    res.status(error.status || 500).end(error.message)
+    await res.status(error.status || 500).end(error.message)
     return
   }
 }
