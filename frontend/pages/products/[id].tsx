@@ -20,10 +20,7 @@ export async function getStaticPaths() {
       fallback: false
     }
   } catch (e) {
-    return {
-      paths: ["/products/0"],
-      fallback: false
-    }
+    throw e
   }
 }
 
