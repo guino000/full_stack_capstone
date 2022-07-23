@@ -1,1 +1,1 @@
-server: gunicorn app:app
+server: pip install pipenv && pipenv install && gunicorn app:app
