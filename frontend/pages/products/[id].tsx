@@ -5,10 +5,11 @@ import axios from "axios";
 import {srcset} from "../../lib/utils/srcset";
 import {UISpacer} from "../../components/UISpacer";
 import Flatted from "flatted";
+import {getCircularReplacer} from "../../lib/utils/getCircularReplacer";
 
 export async function getStaticPaths() {
   const res = await axios.get(`http://localhost:3000/api/products`)
-  const products = Flatted.parse(res.data)
+  const products = Flatted.parse(res.data, getCircularReplacer)
   const paths = products.map((p: Product) => {
     return {params: {id: p.id.toString()}}
   })

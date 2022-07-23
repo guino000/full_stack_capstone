@@ -10,9 +10,8 @@ import {UserProvider} from "@auth0/nextjs-auth0";
 import Layout from "../components/layout";
 
 export default function App({Component, pageProps}: AppProps) {
-  const {user} = pageProps;
   return (
-    <UserProvider user={user}>
+    <UserProvider>
       <StyledEngineProvider injectFirst>
         <Layout>
           <Component {...pageProps} />

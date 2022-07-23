@@ -1,6 +1,7 @@
 import {ProductApiClient} from "../../../lib/products";
 import {NextApiRequest, NextApiResponse} from "next";
 import Flatted from "flatted";
+import {getCircularReplacer} from "../../../lib/utils/getCircularReplacer";
 
 export default async function productDetailsApiHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -11,9 +12,8 @@ export default async function productDetailsApiHandler(req: NextApiRequest, res:
       return
     }
     if (req.method === 'GET') {
-      console.log(req.body)
       const product = await client.getProduct(id.toString())
-      const data = Flatted.stringify(product)
+      const data = Flatted.stringify(product, getCircularReplacer)
       res.json(data)
       res.status(200).end()
     } else {

@@ -51,17 +51,8 @@ export class ProductApiClient {
     return res.data.products
   }
 
-  async getAllProductIds(): Promise<IDParam[]> {
-    const res = await axios.get(`${this.baseUrl}/products/`)
-    console.log(res.data)
-    return res.data['products'].map((p: Product) => {
-      return {params: {id: p.id.toString()}}
-    })
-  }
-
   async getProduct(id: string): Promise<Product[]> {
     const res = await axios.get(`${this.baseUrl}/products/${id}`)
-    console.log(res.data)
     return res.data['product']
   }
 
@@ -71,12 +62,6 @@ export class ProductApiClient {
         Authorization: this.authHeader
       }
     })
-    console.log(res.data)
-
-    if (res.status !== 200) {
-      console.log(res.status)
-      console.log(res.statusText)
-    }
 
     return res.status
   }
@@ -88,32 +73,19 @@ export class ProductApiClient {
       }
     })
 
-    if (res.status !== 200) {
-      console.log(res.status)
-      console.log(res.statusText)
-    }
-
     return res.status
   }
 
   async createProduct(data: ProductCreate): Promise<number> {
     try {
-      console.log(this.authHeader)
-      console.log(this.token)
       const res = await axios.post(`${this.baseUrl}/products/`, data, {
         headers: {
           Authorization: this.authHeader
         }
       })
 
-      if (res.status !== 200) {
-        console.log(res.status)
-        console.log(res.statusText)
-      }
-
       return res.status
     } catch (e) {
-      console.log(e)
       return 500
     }
   }

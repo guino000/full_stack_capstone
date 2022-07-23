@@ -29,10 +29,11 @@ import {LoadingButton} from "@mui/lab";
 import SendIcon from "@mui/icons-material/Send";
 import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
 import Flatted from "flatted";
+import {getCircularReplacer} from "../../../lib/utils/getCircularReplacer";
 
 export async function getStaticPaths() {
   const res = await axios.get(`http://localhost:3000/api/products`)
-  const products = Flatted.parse(res.data)
+  const products = Flatted.parse(res.data, getCircularReplacer)
   const paths = products.map((p: Product) => {
     return {params: {id: p.id.toString()}}
   })
@@ -44,7 +45,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({params}: IDParam) {
   const res = await axios.get(`http://localhost:3000/api/productdetails/${params.id}`)
-  const data = Flatted.parse(res.data)
+  const data = Flatted.parse(res.data, getCircularReplacer)
   return {
     props: {
       productData: data,
@@ -54,7 +55,6 @@ export async function getStaticProps({params}: IDParam) {
 
 export default withPageAuthRequired(function ProductUpdate({productData}: { productData: Product }) {
   const router = useRouter()
-  console.log(router.query);
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
   const [error, setError] = React.useState(false);
@@ -64,7 +64,6 @@ export default withPageAuthRequired(function ProductUpdate({productData}: { prod
 
   const onSubmit: SubmitHandler<Inputs> = useCallback(async (data) => {
     setLoading(true)
-    console.log(data)
     try {
       const res = await axios.patch(`http://localhost:3000/api/products/${productData.id}`, {
         ...data,

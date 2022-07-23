@@ -23,11 +23,12 @@ import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRou
 import {useUser, withPageAuthRequired} from "@auth0/nextjs-auth0";
 import axios from "axios";
 import Flatted from "flatted";
+import {getCircularReplacer} from "../lib/utils/getCircularReplacer";
 
 // @ts-ignore
 export async function getStaticProps() {
   const res = await axios.get(`http://localhost:3000/api/products`)
-  const data = Flatted.parse(res.data)
+  const data = Flatted.parse(res.data, getCircularReplacer)
   return {
     props: {
       productsData: data,
@@ -44,7 +45,6 @@ const fabStyle = {
 export default withPageAuthRequired(function Products({productsData}: { productsData: Product[] }) {
   const theme = useTheme();
   const bigScreen = useMediaQuery(theme.breakpoints.up('sm'));
-  const [deleted, setDeleted] = React.useState(false)
   const [products, setProducts] = React.useState<Product[]>(productsData)
   const {user} = useUser()
   const roles = (user ? (user['http://demozero.net/roles'] as string[]) : []).map(r => r.toLowerCase())
@@ -52,15 +52,14 @@ export default withPageAuthRequired(function Products({productsData}: { products
   const onDelete = useCallback(
     async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: number) => {
       try {
-        const res = await axios.delete(`http://localhost:3000/api/products/${id}`)
+        await axios.delete(`http://localhost:3000/api/products/${id}`)
         const productsRes = await axios.get(`http://localhost:3000/api/products`)
-        const products = Flatted.parse(productsRes.data)
+        const products = Flatted.parse(productsRes.data, getCircularReplacer)
         setProducts(products)
-        setDeleted(res.status === 200)
       } catch (error) {
         console.log(error)
       }
-    }, [setProducts, setDeleted])
+    }, [setProducts])
 
   return (
     <>

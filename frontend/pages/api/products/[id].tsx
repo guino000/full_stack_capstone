@@ -17,8 +17,8 @@ export default withApiAuthRequired(async function productCreateApiHandler(req, r
         return
       }
       const client = new ProductApiClient(accessToken);
-      console.log(req.body)
-      res.status(await client.deleteProduct(id.toString())).end()
+      const status = await client.deleteProduct(id.toString())
+      res.status(status).end()
     } else if (req.method === 'PATCH') {
       const {accessToken} = await getAccessToken(req, res, {
         scopes: ['patch:products']
@@ -28,7 +28,8 @@ export default withApiAuthRequired(async function productCreateApiHandler(req, r
         return
       }
       const client = new ProductApiClient(accessToken);
-      res.status(await client.updateProduct(id.toString(), req.body)).end()
+      const status = await client.updateProduct(id.toString(), req.body)
+      res.status(status).end()
     } else {
       res.status(405).end()
     }

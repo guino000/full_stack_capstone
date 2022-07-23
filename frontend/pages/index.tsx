@@ -8,23 +8,21 @@ import {Container, Divider, Link, useMediaQuery, useTheme} from "@mui/material";
 import {UISpacer} from "../components/UISpacer";
 import axios from "axios";
 import {srcset} from "../lib/utils/srcset";
-import {getSession} from "@auth0/nextjs-auth0";
 import Flatted from "flatted";
+import {getCircularReplacer} from "../lib/utils/getCircularReplacer";
 
 // @ts-ignore
-export async function getServerSideProps({req, res}) {
-  const session = getSession(req, res);
-  const productsData = await axios.get('http://localhost:3000/api/products');
-  const data = Flatted.parse(productsData.data)
+export async function getStaticProps() {
+  const allProducts = await axios.get('http://localhost:3000/api/products');
+  const data = Flatted.parse(allProducts.data, getCircularReplacer)
   return {
     props: {
-      roles: session?.user['http://demozero.net/roles'] || '',
-      productsData: data,
+      productsData: data
     },
   };
 }
 
-export default function Home({productsData}: { productsData: Product[], roles: string[] }) {
+export default function Home({productsData}: { productsData: Product[] }) {
   const theme = useTheme();
   const bigScreen = useMediaQuery(theme.breakpoints.up('sm'));
 
