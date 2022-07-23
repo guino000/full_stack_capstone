@@ -20,7 +20,9 @@ export async function getStaticPaths() {
       fallback: false
     }
   } catch (e) {
-    throw e
+    return {
+      paths: []
+    }
   }
 }
 
