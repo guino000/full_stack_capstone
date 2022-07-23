@@ -3,12 +3,12 @@ import {ProductApiClient} from "../../../lib/products";
 
 export default withApiAuthRequired(async function productCreateApiHandler(req, res) {
   try {
-    const {id} = req.query
+    const {id} = await req.query
     if (id === undefined) {
       await res.status(500).end()
       return
     }
-    if (req.method === 'DELETE') {
+    if (await req.method === 'DELETE') {
       const {accessToken} = await getAccessToken(req, res, {
         scopes: ['delete:products']
       });
@@ -19,7 +19,7 @@ export default withApiAuthRequired(async function productCreateApiHandler(req, r
       const client = new ProductApiClient(accessToken);
       const status = await client.deleteProduct(id.toString())
       await res.status(status).end()
-    } else if (req.method === 'PATCH') {
+    } else if (await req.method === 'PATCH') {
       const {accessToken} = await getAccessToken(req, res, {
         scopes: ['patch:products']
       });
@@ -28,7 +28,8 @@ export default withApiAuthRequired(async function productCreateApiHandler(req, r
         return
       }
       const client = new ProductApiClient(accessToken);
-      const status = await client.updateProduct(id.toString(), req.body)
+      const body = await req.body
+      const status = await client.updateProduct(id.toString(), body)
       await res.status(status).end()
     } else {
       await res.status(405).end()

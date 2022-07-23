@@ -14,8 +14,7 @@ export default withApiAuthRequired(async function productCreateApiHandler(req, r
 
     const client = new ProductApiClient(accessToken);
 
-    if (req.method === 'POST') {
-      console.log(req.body)
+    if (await req.method === 'POST') {
       const status = await client.createProduct(req.body)
       await res.status(status).end()
     } else {

@@ -7,7 +7,7 @@ export default async function productApiHandler(req: NextApiRequest, res: NextAp
   try {
     const client = new ProductApiClient('');
 
-    if (req.method === 'GET') {
+    if (await req.method === 'GET') {
       const products = await client.getAllProducts()
       const data = Flatted.stringify(products, getCircularReplacer)
       await res.json(data)
