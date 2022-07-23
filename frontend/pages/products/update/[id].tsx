@@ -44,7 +44,7 @@ export async function getStaticPaths() {
     }
   } catch (e) {
     return {
-      paths: ["0"],
+      paths: ["/products/update/0"],
       fallback: false
     }
   }
