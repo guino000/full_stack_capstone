@@ -14,13 +14,21 @@ import Image from 'next/image'
 
 // @ts-ignore
 export async function getStaticProps() {
-  const allProducts = await axios.get('http://localhost:3000/api/products');
-  const data = Flatted.parse(allProducts.data, getCircularReplacer)
-  return {
-    props: {
-      productsData: data
-    },
-  };
+  try {
+    const allProducts = await axios.get('http://localhost:3000/api/products');
+    const data = Flatted.parse(allProducts.data, getCircularReplacer)
+    return {
+      props: {
+        productsData: data
+      },
+    };
+  } catch (e) {
+    return {
+      props: {
+        productsData: []
+      },
+    };
+  }
 }
 
 export default function Home({productsData}: { productsData: Product[] }) {

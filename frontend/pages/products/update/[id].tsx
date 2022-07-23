@@ -32,25 +32,40 @@ import Flatted from "flatted";
 import {getCircularReplacer} from "../../../lib/utils/getCircularReplacer";
 
 export async function getStaticPaths() {
-  const res = await axios.get(`http://localhost:3000/api/products`)
-  const products = Flatted.parse(res.data, getCircularReplacer)
-  const paths = products.map((p: Product) => {
-    return {params: {id: p.id.toString()}}
-  })
-  return {
-    paths,
-    fallback: false
+  try {
+    const res = await axios.get(`http://localhost:3000/api/products`)
+    const products = Flatted.parse(res.data, getCircularReplacer)
+    const paths = products.map((p: Product) => {
+      return {params: {id: p.id.toString()}}
+    })
+    return {
+      paths,
+      fallback: false
+    }
+  } catch (e) {
+    return {
+      paths: [0],
+      fallback: false
+    }
   }
 }
 
 export async function getStaticProps({params}: IDParam) {
-  const res = await axios.get(`http://localhost:3000/api/productdetails/${params.id}`)
-  const data = Flatted.parse(res.data, getCircularReplacer)
-  return {
-    props: {
-      productData: data,
-    },
-  };
+  try {
+    const res = await axios.get(`http://localhost:3000/api/productdetails/${params.id}`)
+    const data = Flatted.parse(res.data, getCircularReplacer)
+    return {
+      props: {
+        productData: data,
+      },
+    };
+  } catch (e) {
+    return {
+      props: {
+        productData: [],
+      },
+    };
+  }
 }
 
 export default withPageAuthRequired(function ProductUpdate({productData}: { productData: Product }) {
@@ -63,8 +78,8 @@ export default withPageAuthRequired(function ProductUpdate({productData}: { prod
   const {register, handleSubmit, reset} = useForm<Inputs>()
 
   const onSubmit: SubmitHandler<Inputs> = useCallback(async (data) => {
-    setLoading(true)
     try {
+      setLoading(true)
       const res = await axios.patch(`http://localhost:3000/api/products/${productData.id}`, {
         ...data,
         pictures: pictures

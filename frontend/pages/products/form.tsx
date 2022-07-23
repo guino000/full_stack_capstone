@@ -43,8 +43,8 @@ export default withPageAuthRequired(function ProductCreate({user}) {
   const {register, handleSubmit, reset} = useForm<Inputs>()
 
   const onSubmit: SubmitHandler<Inputs> = useCallback(async (data) => {
-    setLoading(true)
     try {
+      setLoading(true)
       const res = await axios.post('http://localhost:3000/api/products/create', {
         ...data,
         pictures: pictures

@@ -9,25 +9,40 @@ import {getCircularReplacer} from "../../lib/utils/getCircularReplacer";
 import Image from 'next/image'
 
 export async function getStaticPaths() {
-  const res = await axios.get(`http://localhost:3000/api/products`)
-  const products = Flatted.parse(res.data, getCircularReplacer)
-  const paths = products.map((p: Product) => {
-    return {params: {id: p.id.toString()}}
-  })
-  return {
-    paths,
-    fallback: false
+  try {
+    const res = await axios.get(`http://localhost:3000/api/products`)
+    const products = Flatted.parse(res.data, getCircularReplacer)
+    const paths = products.map((p: Product) => {
+      return {params: {id: p.id.toString()}}
+    })
+    return {
+      paths,
+      fallback: false
+    }
+  } catch (e) {
+    return {
+      paths: [0],
+      fallback: false
+    }
   }
 }
 
 export async function getStaticProps({params}: IDParam) {
-  const res = await axios.get(`http://localhost:3000/api/productdetails/${params.id}`)
-  const data = Flatted.parse(res.data)
-  return {
-    props: {
-      productData: data,
-    },
-  };
+  try {
+    const res = await axios.get(`http://localhost:3000/api/productdetails/${params.id}`)
+    const data = Flatted.parse(res.data)
+    return {
+      props: {
+        productData: data,
+      },
+    };
+  } catch (e) {
+    return {
+      props: {
+        productData: [],
+      },
+    };
+  }
 }
 
 export default function ProductDetailsPage({productData}: { productData: Product }) {
