@@ -21,7 +21,8 @@ export async function getStaticPaths() {
     }
   } catch (e) {
     return {
-      paths: []
+      paths: ['/products/0'],
+      fallback: false
     }
   }
 }
@@ -37,9 +38,7 @@ export async function getStaticProps({params}: IDParam) {
     };
   } catch (e) {
     return {
-      props: {
-        productData: [],
-      },
+      notFound: true
     };
   }
 }

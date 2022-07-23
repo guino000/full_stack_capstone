@@ -38,9 +38,7 @@ export async function getStaticProps() {
     };
   } catch (e) {
     return {
-      props: {
-        productsData: [],
-      },
+      notFound: true
     };
   }
 }
