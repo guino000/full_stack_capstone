@@ -20,9 +20,10 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({params}: IDParam) {
   const res = await axios.get(`http://localhost:3000/api/productdetails/${params.id}`)
+  const data = Flatted.parse(res.data)
   return {
     props: {
-      productData: Flatted.parse(res.data),
+      productData: data,
     },
   };
 }

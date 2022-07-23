@@ -27,9 +27,10 @@ import Flatted from "flatted";
 // @ts-ignore
 export async function getStaticProps() {
   const res = await axios.get(`http://localhost:3000/api/products`)
+  const data = Flatted.parse(res.data)
   return {
     props: {
-      productsData: Flatted.parse(res.data),
+      productsData: data,
     },
   };
 }
@@ -53,7 +54,8 @@ export default withPageAuthRequired(function Products({productsData}: { products
       try {
         const res = await axios.delete(`http://localhost:3000/api/products/${id}`)
         const productsRes = await axios.get(`http://localhost:3000/api/products`)
-        setProducts(Flatted.parse(productsRes.data))
+        const products = Flatted.parse(productsRes.data)
+        setProducts(products)
         setDeleted(res.status === 200)
       } catch (error) {
         console.log(error)

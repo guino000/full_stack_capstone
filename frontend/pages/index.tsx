@@ -15,10 +15,11 @@ import Flatted from "flatted";
 export async function getServerSideProps({req, res}) {
   const session = getSession(req, res);
   const productsData = await axios.get('http://localhost:3000/api/products');
+  const data = Flatted.parse(productsData.data)
   return {
     props: {
       roles: session?.user['http://demozero.net/roles'] || '',
-      productsData: Flatted.parse(productsData.data),
+      productsData: data,
     },
   };
 }
