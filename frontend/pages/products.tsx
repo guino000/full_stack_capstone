@@ -24,6 +24,7 @@ import {useUser, withPageAuthRequired} from "@auth0/nextjs-auth0";
 import axios from "axios";
 import Flatted from "flatted";
 import {getCircularReplacer} from "../lib/utils/getCircularReplacer";
+import Image from 'next/image'
 
 // @ts-ignore
 export async function getStaticProps() {
@@ -100,7 +101,7 @@ export default withPageAuthRequired(function Products({productsData}: { products
             >
               <ListItemAvatar>
                 <Avatar>
-                  <img src={item.pictures[0]?.url} alt={item.name}/>
+                  <Image src={item.pictures[0]?.url} alt={item.name}/>
                 </Avatar>
               </ListItemAvatar>
               <ListItemText

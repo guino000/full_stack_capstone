@@ -83,7 +83,7 @@ export default withPageAuthRequired(function ProductUpdate({productData}: { prod
       setError(true)
       setSuccess(false)
     }
-  }, [setLoading, pictures])
+  }, [setLoading, pictures, productData, reset, router])
 
   const addPicture = useCallback(() => {
     setPictures(uniqForObject([...pictures, picture]))

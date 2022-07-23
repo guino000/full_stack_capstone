@@ -1,6 +1,7 @@
 import React from 'react';
 import {useUser} from '@auth0/nextjs-auth0';
 import {UISpacer} from "../components/UISpacer";
+import Image from 'next/image'
 import {Container, Stack} from "@mui/material";
 
 export default function Profile() {
@@ -14,7 +15,7 @@ export default function Profile() {
           {user &&
             (
               <Stack alignItems={"center"}>
-                <img src={user.picture || ''} alt={user?.name || ''}/>
+                <Image src={user.picture || ''} alt={user?.name || ''}/>
                 <h2>{user.name}</h2>
                 <p>{user.email}</p>
                 <p>{(user['http://demozero.net/roles'] as string[])}</p>
