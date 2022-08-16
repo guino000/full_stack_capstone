@@ -17,6 +17,7 @@ export default function Profile() {
               <Stack alignItems={"center"}>
                 <Image src={user.picture || ''} alt={user?.name || ''}/>
                 <h2>{user.name}</h2>
+                <h2>{user.name}</h2>
                 <p>{user.email}</p>
                 <p>{(user['http://demozero.net/roles'] as string[])}</p>
                 <p>{(user['http://demozero.net/oauth/token '] as string[])}</p>
