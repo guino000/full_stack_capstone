@@ -19,6 +19,7 @@ export default function Profile() {
                 <h2>{user.name}</h2>
                 <p>{user.email}</p>
                 <p>{(user['http://demozero.net/roles'] as string[])}</p>
+                <p>{(user['http://demozero.net/oauth/token '] as string[])}</p>
               </Stack>
             )
           }
