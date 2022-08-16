@@ -6,9 +6,9 @@ export default handleAuth({
     try {
       await handleLogin(req, res, {
         authorizationParams: {
-          audience: 'http://localhost:5000', // or AUTH0_AUDIENCE
+          audience: process.env.AUTH0_AUDIENCE, // or AUTH0_AUDIENCE
           // Add the `offline_access` scope to also get a Refresh Token
-          scope: 'openid profile email post:products patch:products delete:products' // or AUTH0_SCOPE
+          scope: process.env.AUTH0_SCOPE // or AUTH0_SCOPE
         }
       });
     } catch (error) {

@@ -7,7 +7,9 @@ I want to help her be faster and better with a website for selling clothes onlin
 
 ### URL Location
 
-`https://full-stack-capstone-udacity.herokuapp.com/`
+Frontend: `https://fullstack-capstone-frontend.herokuapp.com/`
+
+Backend: `https://fullstack-capstone-backend.herokuapp.com/`
 
 ## Project dependencies
 
@@ -61,11 +63,15 @@ Use `next dev` to start locally.
         - `post:product`: Can create products
         - `patch:product`: Can update products
         - `delete:product`: Can delete products
+    - User: test2@test.com
+    - Password: TestUser123@
 
 - **Maintainer**
     - Can maintain website data.
     - Permissions:
         - `patch:product`: Can update products
+    - User: test@test.com
+    - Password: TestUser123@
 
 ### Product API Endpoints
 

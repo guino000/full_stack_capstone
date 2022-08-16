@@ -20,6 +20,14 @@ def create_app(test_config=None):
     app.register_blueprint(cart_api, url_prefix='/users')
     app.register_blueprint(orders_api, url_prefix='/orders')
 
+    @app.route('/')
+    def get_greeting():
+        excited = os.environ['EXCITED']
+        greeting = "Hello"
+        if excited == 'true':
+            greeting = greeting + "!!!!! You are doing great in this Udacity project."
+        return greeting
+
     return app
 
 

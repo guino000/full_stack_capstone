@@ -25,6 +25,7 @@ import {LoadingButton} from '@mui/lab'
 import axios from "axios";
 import {withPageAuthRequired} from "@auth0/nextjs-auth0";
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
+import {GlobalConfig} from "../../lib/globalConfig";
 
 export type Inputs = {
   name: string,
@@ -45,7 +46,7 @@ export default withPageAuthRequired(function ProductCreate({user}) {
   const onSubmit: SubmitHandler<Inputs> = useCallback(async (data) => {
     try {
       setLoading(true)
-      const res = await axios.post('http://localhost:3000/api/products/create', {
+      const res = await axios.post(`${GlobalConfig.API.frontEndUrl}/api/products/create`, {
         ...data,
         pictures: pictures
       })

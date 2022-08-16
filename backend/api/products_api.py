@@ -41,12 +41,13 @@ def create_product(self):
     new_description = body.get('description', None)
     new_cost = body.get('cost', None)
     new_size = body.get('size', None)
-    new_picture_urls = body.get('pictures', '')
+    new_picture_urls = body.get('pictures', None)
 
     try:
         product = Product(new_name, new_description, new_cost, new_size)
-        pictures = [ProductPicture(url) for url in new_picture_urls]
-        product.pictures = pictures
+        if new_picture_urls:
+            pictures = [ProductPicture(url) for url in new_picture_urls]
+            product.pictures = pictures
         db.session.add(product)
         db.session.commit()
 

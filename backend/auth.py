@@ -32,6 +32,7 @@ def get_token_auth_header():
         print(header_parts[0].lower())
         abort(401)
 
+    print(header_parts[1])
     return header_parts[1]
 
 

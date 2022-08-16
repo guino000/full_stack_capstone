@@ -1,4 +1,5 @@
 import axios from "axios";
+import {GlobalConfig} from "./globalConfig";
 
 export type Picture = {
   id: number,
@@ -43,7 +44,7 @@ export class ProductApiClient {
   constructor(token: string) {
     this.token = token
     this.authHeader = `Bearer ${token}`
-    this.baseUrl = 'http://localhost:5000'
+    this.baseUrl = GlobalConfig.API.backendUrl
   }
 
   async getAllProducts(): Promise<Product[]> {

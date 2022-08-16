@@ -28,45 +28,28 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import {LoadingButton} from "@mui/lab";
 import SendIcon from "@mui/icons-material/Send";
 import AddCircleOutlineRoundedIcon from "@mui/icons-material/AddCircleOutlineRounded";
-import Flatted from "flatted";
-import {getCircularReplacer} from "../../../lib/utils/getCircularReplacer";
+import {GlobalConfig} from "../../../lib/globalConfig";
 
-export async function getStaticPaths() {
-  try {
-    const res = await axios.get(`http://localhost:3000/api/products`)
-    const products = Flatted.parse(res.data, getCircularReplacer)
-    const paths = products.map((p: Product) => {
-      return {params: {id: p.id.toString()}}
-    })
-    return {
-      paths,
-      fallback: false
-    }
-  } catch (e) {
-    return {
-      paths: ['/products/update/0'],
-      fallback: false
+// @ts-ignore
+export const getServerSideProps = withPageAuthRequired({
+  getServerSideProps: async ({params}: IDParam) => {
+    try {
+      const res = await axios.get(`${GlobalConfig.API.frontEndUrl}/api/productdetails/${params.id}`)
+      const data = JSON.parse(res.data)
+      return {
+        props: {
+          productData: data,
+        },
+      };
+    } catch (e) {
+      return {
+        notFound: true
+      };
     }
   }
-}
+})
 
-export async function getStaticProps({params}: IDParam) {
-  try {
-    const res = await axios.get(`http://localhost:3000/api/productdetails/${params.id}`)
-    const data = Flatted.parse(res.data, getCircularReplacer)
-    return {
-      props: {
-        productData: data,
-      },
-    };
-  } catch (e) {
-    return {
-      notFound: true
-    };
-  }
-}
-
-export default withPageAuthRequired(function ProductUpdate({productData}: { productData: Product }) {
+export default function ProductUpdate({productData}: { productData: Product }) {
   const router = useRouter()
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
@@ -78,7 +61,7 @@ export default withPageAuthRequired(function ProductUpdate({productData}: { prod
   const onSubmit: SubmitHandler<Inputs> = useCallback(async (data) => {
     try {
       setLoading(true)
-      const res = await axios.patch(`http://localhost:3000/api/products/${productData.id}`, {
+      const res = await axios.patch(`${GlobalConfig.API.frontEndUrl}/api/products/${productData.id}`, {
         ...data,
         pictures: pictures
       })
@@ -191,4 +174,4 @@ export default withPageAuthRequired(function ProductUpdate({productData}: { prod
       </Container>
     </Box>
   )
-})
+}

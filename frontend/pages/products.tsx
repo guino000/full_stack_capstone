@@ -22,26 +22,28 @@ import AddIcon from '@mui/icons-material/Add';
 import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
 import {useUser, withPageAuthRequired} from "@auth0/nextjs-auth0";
 import axios from "axios";
-import Flatted from "flatted";
-import {getCircularReplacer} from "../lib/utils/getCircularReplacer";
-import Image from 'next/image'
+import {GlobalConfig} from "../lib/globalConfig";
 
 // @ts-ignore
-export async function getStaticProps() {
-  try {
-    const res = await axios.get(`http://localhost:3000/api/products`)
-    const data = Flatted.parse(res.data, getCircularReplacer)
-    return {
-      props: {
-        productsData: data,
-      },
-    };
-  } catch (e) {
-    return {
-      notFound: true
-    };
+export const getServerSideProps = withPageAuthRequired({
+  getServerSideProps: async () => {
+    try {
+      const res = await axios.get(`${GlobalConfig.API.frontEndUrl}/api/products`)
+      const data = JSON.parse(res.data)
+      return {
+        props: {
+          productsData: data,
+        },
+      };
+    } catch (e) {
+      return {
+        props: {
+          productsData: [],
+        },
+      };
+    }
   }
-}
+})
 
 const fabStyle = {
   position: 'absolute',
@@ -49,7 +51,7 @@ const fabStyle = {
   right: 16,
 };
 
-export default withPageAuthRequired(function Products({productsData}: { productsData: Product[] }) {
+export default function Products({productsData}: { productsData: Product[] }) {
   const theme = useTheme();
   const bigScreen = useMediaQuery(theme.breakpoints.up('sm'));
   const [products, setProducts] = React.useState<Product[]>(productsData)
@@ -59,9 +61,9 @@ export default withPageAuthRequired(function Products({productsData}: { products
   const onDelete = useCallback(
     async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: number) => {
       try {
-        await axios.delete(`http://localhost:3000/api/products/${id}`)
-        const productsRes = await axios.get(`http://localhost:3000/api/products`)
-        const products = Flatted.parse(productsRes.data, getCircularReplacer)
+        await axios.delete(`${GlobalConfig.API.frontEndUrl}/api/products/${id}`)
+        const productsRes = await axios.get(`${GlobalConfig.API.frontEndUrl}/api/products`)
+        const products = JSON.parse(productsRes.data)
         setProducts(products)
       } catch (error) {
         console.log(error)
@@ -107,7 +109,7 @@ export default withPageAuthRequired(function Products({productsData}: { products
             >
               <ListItemAvatar>
                 <Avatar>
-                  <Image src={item.pictures[0]?.url} alt={item.name}/>
+                  <img src={item.pictures[0]?.url} alt={item.name}/>
                 </Avatar>
               </ListItemAvatar>
               <ListItemText
@@ -126,4 +128,4 @@ export default withPageAuthRequired(function Products({productsData}: { products
       </Container>
     </>
   )
-})
+}

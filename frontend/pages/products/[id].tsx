@@ -4,33 +4,12 @@ import {Card, CardContent, CardHeader, Container, Grid, Typography} from "@mui/m
 import axios from "axios";
 import {srcset} from "../../lib/utils/srcset";
 import {UISpacer} from "../../components/UISpacer";
-import Flatted from "flatted";
-import {getCircularReplacer} from "../../lib/utils/getCircularReplacer";
-import Image from 'next/image'
+import {GlobalConfig} from "../../lib/globalConfig";
 
-export async function getStaticPaths() {
+export async function getServerSideProps({params}: IDParam) {
   try {
-    const res = await axios.get(`http://localhost:3000/api/products`)
-    const products = Flatted.parse(res.data, getCircularReplacer)
-    const paths = products.map((p: Product) => {
-      return {params: {id: p.id.toString()}}
-    })
-    return {
-      paths,
-      fallback: false
-    }
-  } catch (e) {
-    return {
-      paths: ['/products/0'],
-      fallback: false
-    }
-  }
-}
-
-export async function getStaticProps({params}: IDParam) {
-  try {
-    const res = await axios.get(`http://localhost:3000/api/productdetails/${params.id}`)
-    const data = Flatted.parse(res.data)
+    const res = await axios.get(`${GlobalConfig.API.frontEndUrl}/api/productdetails/${params.id}`)
+    const data = JSON.parse(res.data)
     return {
       props: {
         productData: data,
@@ -49,7 +28,7 @@ export default function ProductDetailsPage({productData}: { productData: Product
       <UISpacer size={'big'}/>
       <Grid container spacing={3}>
         <Grid item xs={6}>
-          <Image
+          <img
             {...srcset(productData.pictures[0]?.url, 250, 250)}
             alt={productData.name}
             style={{height: 550, objectFit: 'cover', objectPosition: 'top'}}

@@ -1,23 +1,21 @@
 import {ProductApiClient} from "../../lib/products";
 import {NextApiRequest, NextApiResponse} from "next";
-import Flatted from "flatted";
-import {getCircularReplacer} from "../../lib/utils/getCircularReplacer";
 
 export default async function productApiHandler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const client = new ProductApiClient('');
 
-    if (await req.method === 'GET') {
+    if (req.method === 'GET') {
       const products = await client.getAllProducts()
-      const data = Flatted.stringify(products, getCircularReplacer)
-      await res.json(data)
-      await res.status(200).end()
+      const data = JSON.stringify(products)
+      res.json(data)
+      res.status(200).end()
     } else {
-      await res.status(405).end()
+      res.status(405).end()
     }
   } catch (error) {
     console.error(error)
     // @ts-ignore
-    await res.status(error.status || 500).end(error.message)
+    res.status(error.status || 500).end(error.message)
   }
 }
