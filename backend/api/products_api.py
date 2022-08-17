@@ -37,6 +37,9 @@ def get_product_details(product_id):
 def create_product(self):
     body = request.get_json()
 
+    if body is None:
+        abort(422)
+
     new_name = body.get('name', None)
     new_description = body.get('description', None)
     new_cost = body.get('cost', None)
@@ -48,8 +51,7 @@ def create_product(self):
         if new_picture_urls:
             pictures = [ProductPicture(url) for url in new_picture_urls]
             product.pictures = pictures
-        db.session.add(product)
-        db.session.commit()
+        Product.create(product)
 
         return jsonify({
             'success': True,
@@ -109,8 +111,7 @@ def delete_product(self, product_id):
         abort(404)
 
     try:
-        db.session.delete(product)
-        db.session.commit()
+        Product.delete(product)
 
         return jsonify({
             'success': True,

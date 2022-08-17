@@ -9,6 +9,20 @@ from models import db, User, Order, OrderItem
 orders_api = Blueprint('orders_api', __name__)
 
 
+@orders_api.route('/', methods=['GET'])
+def get_all_orders():
+    orders = Order.query.all()
+
+    if orders is None:
+        abort(404)
+
+    return jsonify({
+        'success': True,
+        'orders': [o.format() for o in orders],
+        'count': len(orders)
+    })
+
+
 @orders_api.route('/<int:order_id>', methods=['GET'])
 def get_order(order_id):
     order = Order.query.filter(Order.id == order_id).one_or_none()
@@ -32,9 +46,12 @@ def generate_unique_order_number():
 @orders_api.route('/', methods=['POST'])
 def create_order():
     body = request.get_json()
-    user_id = body.get('user')
+    if body is None:
+        abort(422)
+
+    user_id = body.get('user', None)
     if user_id is None:
-        abort(400)
+        abort(422)
 
     user = User.query.filter(User.id == user_id).one_or_none()
 
@@ -51,8 +68,7 @@ def create_order():
         for item in order_items:
             order.order_items.append(item)
 
-        db.session.add(order)
-        db.session.commit()
+        Order.create(order)
 
         return jsonify({
             'success': True,

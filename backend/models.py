@@ -49,6 +49,14 @@ class OrderItem(db.Model):
             'quantity': self.quantity
         }
 
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
 
 class CartItem(db.Model):
     __tablename__ = 'cart_items'
@@ -65,6 +73,14 @@ class CartItem(db.Model):
             'product': self.product.format(),
             'quantity': self.quantity
         }
+
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
 
 class User(db.Model):
@@ -86,6 +102,14 @@ class User(db.Model):
             'name': self.name,
             'email': self.email
         }
+
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
 
 class Product(db.Model):
@@ -114,6 +138,14 @@ class Product(db.Model):
             'pictures': [p.format() for p in self.pictures]
         }
 
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
 
 class ProductPicture(db.Model):
     __tablename__ = 'product_pictures'
@@ -131,6 +163,14 @@ class ProductPicture(db.Model):
             'url': self.url,
             'product_id': self.product_id
         }
+
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
 
 class Order(db.Model):
@@ -159,6 +199,14 @@ class Order(db.Model):
             'products': [oi.format() for oi in self.order_items]
         }
 
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
 
 class Cart(db.Model):
     __tablename__ = 'carts'
@@ -172,3 +220,11 @@ class Cart(db.Model):
             'id': self.id,
             'user_id': self.user_id,
         }
+
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()

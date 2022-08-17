@@ -1,14 +1,12 @@
 import json
+import os
 from functools import wraps
 from urllib.request import urlopen
 
 from flask import abort, request
 from jose import jwt
 
-AUTH0_DOMAIN = 'dev-k3iu6ckt.us.auth0.com'
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'http://localhost:5000'
-
 
 class AuthError(Exception):
     def __init__(self, error, status_code):
@@ -55,7 +53,7 @@ def check_permissions(permission, payload):
 
 
 def verify_decode_jwt(token):
-    jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
+    jsonurl = urlopen(f'https://{os.getenv("AUTH0_DOMAIN")}/.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
 
     unverified_header = jwt.get_unverified_header(token)
@@ -86,8 +84,8 @@ def verify_decode_jwt(token):
                 token,
                 rsa_key,
                 algorithms=ALGORITHMS,
-                audience=API_AUDIENCE,
-                issuer=f'https://{AUTH0_DOMAIN}/'
+                audience=os.getenv('API_AUDIENCE'),
+                issuer=f'https://{os.getenv("AUTH0_DOMAIN")}/'
             )
 
             return payload

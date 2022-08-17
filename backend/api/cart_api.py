@@ -43,8 +43,7 @@ def add_item_to_cart(user_id):
         cart_item.product = product
         cart_item.quantity = quantity
         user.cart.cart_items.append(cart_item)
-        db.session.add(cart_item)
-        db.session.commit()
+        CartItem.create(cart_item)
 
         return jsonify({
             'success': True,
@@ -69,8 +68,7 @@ def delete_cart_item(user_id, product_id):
         abort(404)
 
     try:
-        db.session.delete(cart_item)
-        db.session.commit()
+        CartItem.delete(cart_item)
 
         return jsonify({
             'success': True,
@@ -92,8 +90,7 @@ def clean_user_cart(user_id):
     try:
         formatted_ci = [ci.format() for ci in cart.cart_items]
         for ci in cart.cart_items:
-            db.session.delete(ci)
-        db.session.commit()
+            CartItem.delete(ci)
 
         return jsonify({
             'success': True,

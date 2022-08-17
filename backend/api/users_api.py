@@ -61,6 +61,9 @@ def update_user(user_id):
 def create_user():
     body = request.get_json()
 
+    if body is None:
+        abort(422)
+
     try:
         new_name = body.get('name')
         new_email = body.get('email')
@@ -68,8 +71,7 @@ def create_user():
         new_user = User(name=new_name, email=new_email)
         new_user.cart = Cart()
 
-        db.session.add(new_user)
-        db.session.commit()
+        User.create(new_user)
 
         return jsonify({
             'success': True,
@@ -89,8 +91,7 @@ def delete_user(user_id):
         abort(404)
 
     try:
-        db.session.delete(user)
-        db.session.commit()
+        User.delete(user)
 
         return jsonify({
             'success': True,
